@@ -41,26 +41,34 @@
                         <div class="col-4">
                             <div class="mb-3">
                                 <label for="gold" class="form-label">🥇 Gold</label>
-                                <input type="number" class="form-control" id="gold" name="gold" 
+                                <input type="number" class="form-control" id="gold" name="gold"
                                        min="0" value="0" required>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="mb-3">
                                 <label for="silver" class="form-label">🥈 Silver</label>
-                                <input type="number" class="form-control" id="silver" name="silver" 
+                                <input type="number" class="form-control" id="silver" name="silver"
                                        min="0" value="0" required>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="mb-3">
                                 <label for="bronze" class="form-label">🥉 Bronze</label>
-                                <input type="number" class="form-control" id="bronze" name="bronze" 
+                                <input type="number" class="form-control" id="bronze" name="bronze"
                                        min="0" value="0" required>
                             </div>
                         </div>
                     </div>
-                    
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" value="on" id="allow_decrease" name="allow_decrease">
+                        <label class="form-check-label" for="allow_decrease">
+                            Allow medal decreases (correction)
+                        </label>
+                        <div class="form-text">Decreases are blocked by default to avoid accidental regressions.</div>
+                    </div>
+
                     <button type="submit" class="btn btn-primary w-100">Update Medals</button>
                 </form>
             </div>
@@ -107,6 +115,7 @@
                     <button type="submit" class="btn btn-warning w-100">
                         <i class="bi bi-calculator"></i> Recalculate All Scores
                     </button>
+                    <p class="small text-muted mt-2 mb-0">Medal updates now recalculate scores automatically.</p>
                 </form>
             </div>
         </div>
