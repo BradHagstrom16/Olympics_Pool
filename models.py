@@ -437,62 +437,63 @@ def install_pick_constraints(connection=None):
             return
 
         # Enforce total picks limit
+        total_limit = int(TOTAL_PICKS)
         conn.execute(text(
-            """
+            f"""
             CREATE TRIGGER IF NOT EXISTS picks_total_limit_before_insert
             BEFORE INSERT ON picks
             WHEN (
-                (SELECT COUNT(*) FROM picks WHERE user_id = NEW.user_id) >= :total_limit
+                (SELECT COUNT(*) FROM picks WHERE user_id = NEW.user_id) >= {total_limit}
             )
             BEGIN
                 SELECT RAISE(ABORT, 'User has reached the maximum number of picks.');
             END;
             """
-        ), {'total_limit': TOTAL_PICKS})
+        ))
 
         conn.execute(text(
-            """
+            f"""
             CREATE TRIGGER IF NOT EXISTS picks_total_limit_before_update
             BEFORE UPDATE OF user_id ON picks
             WHEN (
-                (SELECT COUNT(*) FROM picks WHERE user_id = NEW.user_id AND id != NEW.id) >= :total_limit
+                (SELECT COUNT(*) FROM picks WHERE user_id = NEW.user_id AND id != NEW.id) >= {total_limit}
             )
             BEGIN
                 SELECT RAISE(ABORT, 'User has reached the maximum number of picks.');
             END;
             """
-        ), {'total_limit': TOTAL_PICKS})
+        ))
 
         # Enforce per-tier limits
         for tier, tier_config in TIERS.items():
-            limit = tier_config['picks']
+            limit = int(tier_config['picks'])
             conn.execute(text(
-                """
+                f"""
                 CREATE TRIGGER IF NOT EXISTS picks_tier_limit_insert_t{tier}
                 BEFORE INSERT ON picks
                 WHEN (
-                    NEW.tier = :tier AND
-                    (SELECT COUNT(*) FROM picks WHERE user_id = NEW.user_id AND tier = NEW.tier) >= :limit
+                    NEW.tier = {tier} AND
+                    (SELECT COUNT(*) FROM picks WHERE user_id = NEW.user_id AND tier = NEW.tier) >= {limit}
                 )
                 BEGIN
                     SELECT RAISE(ABORT, 'Tier pick limit exceeded.');
                 END;
-                """.replace('{tier}', str(tier))
-            ), {'tier': tier, 'limit': limit})
+                """
+            ))
 
             conn.execute(text(
-                """
+                f"""
                 CREATE TRIGGER IF NOT EXISTS picks_tier_limit_update_t{tier}
                 BEFORE UPDATE OF tier, user_id ON picks
                 WHEN (
-                    NEW.tier = :tier AND
-                    (SELECT COUNT(*) FROM picks WHERE user_id = NEW.user_id AND tier = NEW.tier AND id != NEW.id) >= :limit
+                    NEW.tier = {tier} AND
+                    (SELECT COUNT(*) FROM picks WHERE user_id = NEW.user_id AND tier = NEW.tier AND id != NEW.id) >= {limit}
                 )
                 BEGIN
                     SELECT RAISE(ABORT, 'Tier pick limit exceeded.');
                 END;
-                """.replace('{tier}', str(tier))
-            ), {'tier': tier, 'limit': limit})
+                """
+            ))
 
     if connection is not None:
         _create_triggers(connection)
