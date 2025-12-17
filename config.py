@@ -8,6 +8,8 @@ import os
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
+from data.countries import COUNTRIES_BY_TIER, EXCLUDED_COUNTRIES
+
 # Base directory of the application
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -62,74 +64,6 @@ Countries marked with ⚪ have not won a medal in the last four
 Winter Olympics (2010–2022). Choose wisely—or boldly.
 """
 
-# =============================================================================
-# COUNTRY DATA
-# =============================================================================
-
-# Countries by tier (locked in from statistical analysis)
-# Format: IOC code -> (name, has_medaled_2010_2022)
-TIER_1_COUNTRIES = {
-    'NOR': ('Norway', True),
-    'GER': ('Germany', True),
-    'USA': ('United States', True),
-    'CAN': ('Canada', True),
-}
-
-TIER_2_COUNTRIES = {
-    'NED': ('Netherlands', True),
-    'AUT': ('Austria', True),
-    'SWE': ('Sweden', True),
-    'FRA': ('France', True),
-    'SUI': ('Switzerland', True),
-    'KOR': ('South Korea', True),
-}
-
-TIER_3_COUNTRIES = {
-    'CHN': ('China', True),
-    'JPN': ('Japan', True),
-    'ITA': ('Italy', True),  # 2026 Host!
-}
-
-TIER_4_COUNTRIES = {
-    'FIN': ('Finland', True),
-    'CZE': ('Czech Republic', True),
-    'SLO': ('Slovenia', True),
-}
-
-TIER_5_COUNTRIES = {
-    'POL': ('Poland', True),
-    'GBR': ('Great Britain', True),
-    'AUS': ('Australia', True),
-    'SVK': ('Slovakia', True),
-    'LAT': ('Latvia', True),
-}
-
-# Tier 6: Countries that have medaled 2010-2022 (but not consistently)
-TIER_6_MEDALED = {
-    'NZL': ('New Zealand', True),
-    'UKR': ('Ukraine', True),
-    'HUN': ('Hungary', True),
-    'KAZ': ('Kazakhstan', True),
-    'CRO': ('Croatia', True),
-    'BEL': ('Belgium', True),
-    'ESP': ('Spain', True),
-    'EST': ('Estonia', True),
-    'LIE': ('Liechtenstein', True),
-}
-
-# Tier 6: Known countries that have NOT medaled 2010-2022
-# This list will be expanded when official participant list is released
-TIER_6_NEVER_MEDALED = {
-    # Add more as official list becomes available
-    # 'XXX': ('Country Name', False),
-}
-
-# Excluded countries (banned)
-EXCLUDED_COUNTRIES = {
-    'RUS': 'Russia',
-    'BLR': 'Belarus',
-    'AIN': 'Individual Neutral Athletes',
-}
 
 # =============================================================================
 # FLASK CONFIGURATION

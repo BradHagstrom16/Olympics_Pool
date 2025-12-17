@@ -23,19 +23,19 @@
                 </thead>
                 <tbody>
                     {% for user in users %}
-                    <tr class="{% if current_user.is_authenticated and user.id == current_user.id %}table-warning{% endif %}">
+                    <tr class="{% if user.is_current_user %}table-warning{% endif %}">
                         <td>{{ loop.index }}</td>
                         <td>
                             {% if show_picks %}
                             <a href="{{ url_for('user_detail', user_id=user.id) }}" class="text-decoration-none">
-                                <strong>{{ user.get_display_name() }}</strong>
+                                <strong>{{ user.display_name }}</strong>
                             </a>
                             {% else %}
-                            <strong>{{ user.get_display_name() }}</strong>
+                            <strong>{{ user.display_name }}</strong>
                             {% endif %}
                         </td>
                         <td class="text-center">
-                            {% if user.is_ready() %}
+                            {% if user.ready %}
                             <span class="badge bg-success">✓ Ready</span>
                             {% else %}
                             <span class="badge bg-warning text-dark">Pending</span>

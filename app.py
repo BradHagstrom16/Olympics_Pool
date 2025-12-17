@@ -15,13 +15,14 @@ from sqlalchemy import func
 from email_validator import validate_email, EmailNotValidError
 
 from config import (
-    config, TIERS, MEDAL_POINTS, TIMEZONE, PICK_DEADLINE,
+    config, TIERS, MEDAL_POINTS, TIMEZONE, PICK_DEADLINE, TOTAL_PICKS,
     TIER_6_WARNING, get_medal_points
 )
 from models import (
     db, User, Country, Pick, Tiebreaker, GameState,
     is_picks_locked, get_current_time, validate_picks,
-    calculate_all_scores, get_leaderboard
+    calculate_all_scores, get_leaderboard, install_pick_constraints,
+    MedalAudit
 )
 
 # =============================================================================
@@ -35,6 +36,8 @@ register_template_helpers(app)
 
 # Initialize extensions
 db.init_app(app)
+with app.app_context():
+    install_pick_constraints()
 csrf = CSRFProtect(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -402,11 +405,30 @@ def edit_picks():
 @app.route('/users')
 def users():
     """List all registered users (names only, no picks until deadline)."""
-    all_users = User.query.order_by(User.created_at).all()
-    
+    show_picks = is_picks_locked()
+
+    all_users = User.query.options(
+        db.load_only(User.id, User.username, User.display_name, User.created_at, User.total_points),
+        db.noload(User.picks)
+    ).order_by(User.created_at).all()
+
+    users_data = []
+    for user in all_users:
+        pick_count = Pick.query.filter_by(user_id=user.id).count()
+        tiebreaker_exists = Tiebreaker.query.filter_by(user_id=user.id).first() is not None
+        ready = pick_count == TOTAL_PICKS and tiebreaker_exists
+        users_data.append({
+            'id': user.id,
+            'display_name': user.get_display_name(),
+            'created_at': user.created_at,
+            'ready': ready,
+            'is_current_user': current_user.is_authenticated and user.id == current_user.id,
+            'total_points': user.total_points if show_picks else None,
+        })
+
     return render_template('users.html',
-                         users=all_users,
-                         show_picks=is_picks_locked())
+                         users=users_data,
+                         show_picks=show_picks)
 
 
 @app.route('/user/<int:user_id>')
@@ -508,20 +530,60 @@ def admin_medals():
         gold = request.form.get('gold', type=int, default=0)
         silver = request.form.get('silver', type=int, default=0)
         bronze = request.form.get('bronze', type=int, default=0)
-        
+        allow_decrease = request.form.get('allow_decrease') == 'on'
+
+        errors = []
+        for label, value in [('gold', gold), ('silver', silver), ('bronze', bronze)]:
+            if value is None or value < 0:
+                errors.append(f"{label.title()} must be zero or greater.")
+
         country = Country.query.get(country_id)
         if country:
-            country.gold_count = gold
-            country.silver_count = silver
-            country.bronze_count = bronze
-            country.updated_at = datetime.utcnow()
-            
-            # Update game state timestamp
-            game_state = GameState.get_instance()
-            game_state.medals_updated_at = datetime.utcnow()
-            
-            db.session.commit()
-            flash(f'Updated medals for {country.name}.', 'success')
+            if not allow_decrease and (
+                gold < country.gold_count or
+                silver < country.silver_count or
+                bronze < country.bronze_count
+            ):
+                errors.append('Medal counts cannot decrease unless corrections are explicitly allowed.')
+
+            if errors:
+                for msg in errors:
+                    flash(msg, 'error')
+            elif (gold, silver, bronze) == (
+                country.gold_count, country.silver_count, country.bronze_count
+            ):
+                flash('No changes detected for this country.', 'info')
+            else:
+                now = datetime.utcnow()
+                audit_entry = MedalAudit(
+                    country=country,
+                    updated_by=current_user if current_user.is_authenticated else None,
+                    source='admin_form',
+                    gold_before=country.gold_count,
+                    silver_before=country.silver_count,
+                    bronze_before=country.bronze_count,
+                    gold_after=gold,
+                    silver_after=silver,
+                    bronze_after=bronze,
+                )
+
+                country.gold_count = gold
+                country.silver_count = silver
+                country.bronze_count = bronze
+                country.updated_at = now
+
+                game_state = GameState.get_instance()
+                game_state.medals_updated_at = now
+
+                try:
+                    calculate_all_scores(commit_session=False)
+                    game_state.scores_calculated_at = now
+                    db.session.add(audit_entry)
+                    db.session.commit()
+                    flash(f'Updated medals for {country.name} and recalculated scores.', 'success')
+                except Exception as exc:  # pragma: no cover - defensive rollback
+                    db.session.rollback()
+                    flash(f'Failed to update medals: {exc}', 'error')
         else:
             flash('Country not found.', 'error')
     

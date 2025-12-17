@@ -16,7 +16,9 @@ from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from config import TIERS, MEDAL_POINTS, TIMEZONE, PICK_DEADLINE
+from sqlalchemy import event, text
+
+from config import TIERS, MEDAL_POINTS, TIMEZONE, PICK_DEADLINE, TOTAL_PICKS
 
 db = SQLAlchemy()
 
@@ -206,6 +208,11 @@ class Pick(db.Model):
         return f'<Pick User:{self.user_id} Country:{self.country.code}>'
 
 
+@event.listens_for(Pick.__table__, 'after_create')
+def _picks_after_create(target, connection, **kwargs):
+    install_pick_constraints(connection)
+
+
 class Tiebreaker(db.Model):
     """
     User's tiebreaker guesses (USA medal counts).
@@ -271,6 +278,33 @@ class GameState(db.Model):
     
     def __repr__(self):
         return f'<GameState updated:{self.medals_updated_at} complete:{self.is_complete}>'
+
+
+class MedalAudit(db.Model):
+    """Audit log of medal changes for traceability."""
+
+    __tablename__ = 'medal_audit'
+
+    id = db.Column(db.Integer, primary_key=True)
+    country_id = db.Column(db.Integer, db.ForeignKey('countries.id'), nullable=False)
+    updated_by_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    source = db.Column(db.String(100), nullable=False, default='admin_form')
+
+    gold_before = db.Column(db.Integer, nullable=False)
+    silver_before = db.Column(db.Integer, nullable=False)
+    bronze_before = db.Column(db.Integer, nullable=False)
+
+    gold_after = db.Column(db.Integer, nullable=False)
+    silver_after = db.Column(db.Integer, nullable=False)
+    bronze_after = db.Column(db.Integer, nullable=False)
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    country = db.relationship('Country', backref='medal_audits')
+    updated_by = db.relationship('User')
+
+    def __repr__(self):
+        return f'<MedalAudit country={self.country_id} source={self.source}>'
 
 
 # =============================================================================
@@ -339,12 +373,13 @@ def validate_picks(user_id: int, picks_data: dict) -> tuple[bool, list[str]]:
     return len(errors) == 0, errors
 
 
-def calculate_all_scores() -> None:
+def calculate_all_scores(commit_session: bool = True) -> None:
     """Recalculate scores for all users."""
     users = User.query.all()
     for user in users:
         user.calculate_total_points()
-    db.session.commit()
+    if commit_session:
+        db.session.commit()
 
 
 def get_leaderboard() -> list[dict]:
@@ -384,5 +419,84 @@ def get_leaderboard() -> list[dict]:
     # Add ranks (handling ties)
     for i, entry in enumerate(leaderboard):
         entry['rank'] = i + 1
-    
+
     return leaderboard
+
+
+def install_pick_constraints(connection=None):
+    """Install SQLite triggers to enforce total and per-tier pick counts."""
+
+    def _create_triggers(conn):
+        if conn.dialect.name != 'sqlite':
+            return
+
+        table_exists = conn.execute(text(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='picks'"
+        )).fetchone()
+        if not table_exists:
+            return
+
+        # Enforce total picks limit
+        conn.execute(text(
+            """
+            CREATE TRIGGER IF NOT EXISTS picks_total_limit_before_insert
+            BEFORE INSERT ON picks
+            WHEN (
+                (SELECT COUNT(*) FROM picks WHERE user_id = NEW.user_id) >= :total_limit
+            )
+            BEGIN
+                SELECT RAISE(ABORT, 'User has reached the maximum number of picks.');
+            END;
+            """
+        ), {'total_limit': TOTAL_PICKS})
+
+        conn.execute(text(
+            """
+            CREATE TRIGGER IF NOT EXISTS picks_total_limit_before_update
+            BEFORE UPDATE OF user_id ON picks
+            WHEN (
+                (SELECT COUNT(*) FROM picks WHERE user_id = NEW.user_id AND id != NEW.id) >= :total_limit
+            )
+            BEGIN
+                SELECT RAISE(ABORT, 'User has reached the maximum number of picks.');
+            END;
+            """
+        ), {'total_limit': TOTAL_PICKS})
+
+        # Enforce per-tier limits
+        for tier, tier_config in TIERS.items():
+            limit = tier_config['picks']
+            conn.execute(text(
+                """
+                CREATE TRIGGER IF NOT EXISTS picks_tier_limit_insert_t{tier}
+                BEFORE INSERT ON picks
+                WHEN (
+                    NEW.tier = :tier AND
+                    (SELECT COUNT(*) FROM picks WHERE user_id = NEW.user_id AND tier = NEW.tier) >= :limit
+                )
+                BEGIN
+                    SELECT RAISE(ABORT, 'Tier pick limit exceeded.');
+                END;
+                """.replace('{tier}', str(tier))
+            ), {'tier': tier, 'limit': limit})
+
+            conn.execute(text(
+                """
+                CREATE TRIGGER IF NOT EXISTS picks_tier_limit_update_t{tier}
+                BEFORE UPDATE OF tier, user_id ON picks
+                WHEN (
+                    NEW.tier = :tier AND
+                    (SELECT COUNT(*) FROM picks WHERE user_id = NEW.user_id AND tier = NEW.tier AND id != NEW.id) >= :limit
+                )
+                BEGIN
+                    SELECT RAISE(ABORT, 'Tier pick limit exceeded.');
+                END;
+                """.replace('{tier}', str(tier))
+            ), {'tier': tier, 'limit': limit})
+
+    if connection is not None:
+        _create_triggers(connection)
+    else:
+        engine = db.engine
+        with engine.begin() as conn:
+            _create_triggers(conn)
