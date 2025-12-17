@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - {{ app_name }}{% endblock %}
+
+{% block content %}
+<h2><i class="bi bi-gear"></i> Admin Dashboard</h2>
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3>{{ total_users }}</h3>
+                <p class="text-muted mb-0">Total Users</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3>{{ ready_users }}</h3>
+                <p class="text-muted mb-0">Picks Submitted</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3>{{ total_medals }}</h3>
+                <p class="text-muted mb-0">Total Medals Entered</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3>
+                    {% if picks_locked %}
+                    <span class="badge bg-success">Locked</span>
+                    {% else %}
+                    <span class="badge bg-warning text-dark">Open</span>
+                    {% endif %}
+                </h3>
+                <p class="text-muted mb-0">Picks Status</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Admin Actions -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('admin_users') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-people"></i> Manage Users
+                    </a>
+                    <a href="{{ url_for('admin_medals') }}" class="btn btn-outline-success">
+                        <i class="bi bi-award"></i> Update Medals
+                    </a>
+                    <a href="{{ url_for('admin_picks') }}" class="btn btn-outline-info">
+                        <i class="bi bi-list-check"></i> View All Picks
+                    </a>
+                    <form action="{{ url_for('admin_calculate') }}" method="POST" class="d-grid">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-outline-warning">
+                            <i class="bi bi-calculator"></i> Recalculate Scores
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Game State</h5>
+            </div>
+            <div class="card-body">
+                <p>
+                    <strong>Medals Last Updated:</strong><br>
+                    {% if game_state.medals_updated_at %}
+                    {{ game_state.medals_updated_at.strftime('%b %d, %Y at %I:%M %p') }} UTC
+                    {% else %}
+                    Never
+                    {% endif %}
+                </p>
+                <p>
+                    <strong>Scores Last Calculated:</strong><br>
+                    {% if game_state.scores_calculated_at %}
+                    {{ game_state.scores_calculated_at.strftime('%b %d, %Y at %I:%M %p') }} UTC
+                    {% else %}
+                    Never
+                    {% endif %}
+                </p>
+                <p class="mb-0">
+                    <strong>Game Complete:</strong>
+                    {% if game_state.is_complete %}
+                    <span class="badge bg-success">Yes</span>
+                    {% else %}
+                    <span class="badge bg-secondary">No</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

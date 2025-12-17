@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Medal Table - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-award"></i> Medal Table</h2>
+    {% if last_updated %}
+    <small class="text-muted">
+        <i class="bi bi-clock"></i> Updated: {{ last_updated.strftime('%b %d, %I:%M %p') }} UTC
+    </small>
+    {% endif %}
+</div>
+
+{% if countries %}
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="width: 60px;">Rank</th>
+                        <th>Country</th>
+                        <th>Tier</th>
+                        <th class="text-center">🥇 Gold</th>
+                        <th class="text-center">🥈 Silver</th>
+                        <th class="text-center">🥉 Bronze</th>
+                        <th class="text-center">Total</th>
+                        <th class="text-end">Points</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for country in countries %}
+                    <tr>
+                        <td><strong>{{ loop.index }}</strong></td>
+                        <td>
+                            <a href="{{ url_for('country_detail', country_id=country.id) }}" class="text-decoration-none">
+                                {{ country.name }}
+                            </a>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary">T{{ country.tier }}</span>
+                        </td>
+                        <td class="text-center fw-bold">{{ country.gold_count }}</td>
+                        <td class="text-center">{{ country.silver_count }}</td>
+                        <td class="text-center">{{ country.bronze_count }}</td>
+                        <td class="text-center"><strong>{{ country.total_medals }}</strong></td>
+                        <td class="text-end">
+                            <span class="badge bg-success">{{ country.calculate_points() }}</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info">
+    <i class="bi bi-hourglass-split"></i>
+    No medals have been awarded yet. Check back once the Games begin!
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Auto-refresh every 5 minutes
+setTimeout(function() {
+    location.reload();
+}, 5 * 60 * 1000);
+</script>
+{% endblock %}

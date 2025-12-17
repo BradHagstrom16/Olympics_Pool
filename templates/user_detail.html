@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user.get_display_name() }}'s Picks - {{ app_name }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('users') }}">Players</a></li>
+        <li class="breadcrumb-item active">{{ user.get_display_name() }}</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-lg-8">
+        <h2>{{ user.get_display_name() }}'s Picks</h2>
+        
+        {% if not user.has_complete_picks() %}
+        <div class="alert alert-warning">
+            This player hasn't submitted their picks yet.
+        </div>
+        {% else %}
+        
+        {% for tier_num in range(1, 7) %}
+        {% set tier_info = tiers[tier_num] %}
+        {% set tier_picks = picks_by_tier[tier_num] %}
+        
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="mb-0">Tier {{ tier_num }}: {{ tier_info.name }}</h6>
+                    <small class="text-muted">×{{ tier_info.multiplier }} multiplier</small>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if tier_picks %}
+                <div class="row">
+                    {% for pick in tier_picks %}
+                    <div class="col-md-6 mb-2">
+                        <div class="d-flex justify-content-between align-items-center p-2 bg-light rounded">
+                            <div>
+                                <a href="{{ url_for('country_detail', country_id=pick.country.id) }}" class="text-decoration-none">
+                                    <strong>{{ pick.country.name }}</strong>
+                                </a>
+                                <span class="text-muted">({{ pick.country.code }})</span>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-warning text-dark">🥇{{ pick.country.gold_count }}</span>
+                                <span class="badge bg-secondary">🥈{{ pick.country.silver_count }}</span>
+                                <span class="badge bg-danger">🥉{{ pick.country.bronze_count }}</span>
+                                <br>
+                                <small class="text-success fw-bold">{{ pick.country.calculate_points() }} pts</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">No picks for this tier.</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+    
+    <div class="col-lg-4">
+        <!-- Points Summary -->
+        <div class="card mb-3">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-trophy"></i> Score</h5>
+            </div>
+            <div class="card-body text-center">
+                <h1 class="display-4 text-primary">{{ user.total_points }}</h1>
+                <p class="text-muted mb-0">Total Points</p>
+            </div>
+        </div>
+        
+        <!-- Tiebreaker -->
+        {% if tiebreaker %}
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h6 class="mb-0"><i class="bi bi-shuffle"></i> USA Tiebreaker</h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <div class="fs-4">🥇</div>
+                        <div class="fw-bold">{{ tiebreaker.usa_gold }}</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="fs-4">🥈</div>
+                        <div class="fw-bold">{{ tiebreaker.usa_silver }}</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="fs-4">🥉</div>
+                        <div class="fw-bold">{{ tiebreaker.usa_bronze }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

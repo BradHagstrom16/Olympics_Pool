@@ -1,0 +1,180 @@
+/* 2026 Milano-Cortina Winter Olympics Pool - Custom Styles */
+
+/* Color scheme - Winter Olympics inspired */
+:root {
+    --olympics-blue: #0085c7;
+    --olympics-yellow: #f4c300;
+    --olympics-black: #000000;
+    --olympics-green: #009f3d;
+    --olympics-red: #df0024;
+    --snow-white: #f8f9fa;
+    --ice-blue: #e3f2fd;
+}
+
+/* Navbar customization */
+.navbar {
+    background: linear-gradient(135deg, var(--olympics-blue), #0066a4) !important;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+/* Card hover effects */
+.card {
+    transition: box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Medal badges */
+.badge {
+    font-weight: 500;
+}
+
+/* Table improvements */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.table th {
+    white-space: nowrap;
+}
+
+/* Footer styling */
+footer {
+    background-color: var(--snow-white);
+}
+
+/* Leaderboard rank styling */
+.fs-5.fw-bold {
+    min-width: 30px;
+    display: inline-block;
+}
+
+/* Pick selection styling */
+.country-checkbox {
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+}
+
+.country-checkbox:hover {
+    background-color: var(--ice-blue);
+    border-color: var(--olympics-blue);
+}
+
+.country-checkbox.selected {
+    background-color: #d1e7dd;
+    border-color: #0f5132;
+}
+
+/* Tier section styling */
+.tier-section {
+    border-left-width: 5px !important;
+}
+
+/* Sticky sidebar */
+.sticky-top {
+    z-index: 1000;
+}
+
+/* Alert customization */
+.alert-info {
+    background-color: var(--ice-blue);
+    border-color: var(--olympics-blue);
+}
+
+/* Button improvements */
+.btn-primary {
+    background-color: var(--olympics-blue);
+    border-color: var(--olympics-blue);
+}
+
+.btn-primary:hover {
+    background-color: #0066a4;
+    border-color: #0066a4;
+}
+
+/* Mobile improvements */
+@media (max-width: 768px) {
+    .navbar-brand span:first-child {
+        font-size: 1.5rem;
+    }
+    
+    .display-4 {
+        font-size: 2.5rem;
+    }
+    
+    .table {
+        font-size: 0.9rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+}
+
+/* Olympics rings animation (subtle) */
+.navbar-brand span:first-child {
+    animation: gentle-bounce 3s ease-in-out infinite;
+}
+
+@keyframes gentle-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-2px); }
+}
+
+/* Medal emoji sizing */
+.fs-1 {
+    font-size: 2.5rem !important;
+}
+
+.fs-2 {
+    font-size: 2rem !important;
+}
+
+/* Progress and status badges */
+.badge.bg-success {
+    background-color: var(--olympics-green) !important;
+}
+
+.badge.bg-warning {
+    background-color: var(--olympics-yellow) !important;
+}
+
+.badge.bg-danger {
+    background-color: var(--olympics-red) !important;
+}
+
+/* Accordion improvements for admin */
+.accordion-button:not(.collapsed) {
+    background-color: var(--ice-blue);
+    color: var(--olympics-blue);
+}
+
+/* Never medaled indicator */
+.never-medaled {
+    opacity: 0.85;
+    border-style: dashed !important;
+}
+
+/* Countdown/deadline banner */
+.bg-warning {
+    background-color: var(--olympics-yellow) !important;
+}
+
+/* Print styles */
+@media print {
+    .navbar, footer, .btn {
+        display: none !important;
+    }
+    
+    .card {
+        border: 1px solid #ccc !important;
+        box-shadow: none !important;
+    }
+}

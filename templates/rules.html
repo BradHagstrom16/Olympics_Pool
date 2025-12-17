@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}Rules - {{ app_name }}{% endblock %}
+
+{% block content %}
+<h2><i class="bi bi-book"></i> Game Rules</h2>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Overview -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">🏔️ How to Play</h5>
+            </div>
+            <div class="card-body">
+                <ol class="mb-0">
+                    <li class="mb-2">
+                        <strong>Pick 8 Countries</strong> — Select countries from 6 different tiers
+                    </li>
+                    <li class="mb-2">
+                        <strong>Earn Points from Medals</strong> — When your countries win medals, you earn points
+                    </li>
+                    <li class="mb-2">
+                        <strong>Lower Tiers = More Points</strong> — Underdog countries have higher point multipliers
+                    </li>
+                    <li class="mb-2">
+                        <strong>Submit USA Predictions</strong> — Tiebreaker based on your USA medal count guesses
+                    </li>
+                    <li class="mb-0">
+                        <strong>Most Points Wins!</strong>
+                    </li>
+                </ol>
+            </div>
+        </div>
+        
+        <!-- Pick Requirements -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">📋 Pick Requirements</h5>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Tier</th>
+                            <th>Name</th>
+                            <th class="text-center">Picks Required</th>
+                            <th>Countries</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Tier 1</strong></td>
+                            <td>Elite</td>
+                            <td class="text-center">1</td>
+                            <td><small>Norway, Germany, USA, Canada</small></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tier 2</strong></td>
+                            <td>Strong</td>
+                            <td class="text-center">2</td>
+                            <td><small>Netherlands, Austria, Sweden, France, Switzerland, South Korea</small></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tier 3</strong></td>
+                            <td>Competitive</td>
+                            <td class="text-center">1</td>
+                            <td><small>China, Japan, Italy (Host!)</small></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tier 4</strong></td>
+                            <td>Emerging</td>
+                            <td class="text-center">1</td>
+                            <td><small>Finland, Czech Republic, Slovenia</small></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tier 5</strong></td>
+                            <td>Occasional</td>
+                            <td class="text-center">1</td>
+                            <td><small>Poland, Great Britain, Australia, Slovakia, Latvia</small></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tier 6</strong></td>
+                            <td>Wildcard</td>
+                            <td class="text-center">2</td>
+                            <td><small>All other participating countries</small></td>
+                        </tr>
+                    </tbody>
+                    <tfoot class="table-dark">
+                        <tr>
+                            <td colspan="2"><strong>Total</strong></td>
+                            <td class="text-center"><strong>8</strong></td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Scoring -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">🏅 Scoring System</h5>
+            </div>
+            <div class="card-body">
+                <h6>Base Medal Values:</h6>
+                <ul>
+                    <li>🥇 <strong>Gold</strong> = 3 points × tier multiplier</li>
+                    <li>🥈 <strong>Silver</strong> = 2 points × tier multiplier</li>
+                    <li>🥉 <strong>Bronze</strong> = 1 point × tier multiplier</li>
+                </ul>
+                
+                <h6 class="mt-4">Points Per Medal by Tier:</h6>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Tier</th>
+                                <th>Multiplier</th>
+                                <th class="text-center">🥇 Gold</th>
+                                <th class="text-center">🥈 Silver</th>
+                                <th class="text-center">🥉 Bronze</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tier_num, tier_info in tiers.items() %}
+                            <tr>
+                                <td><strong>Tier {{ tier_num }}</strong></td>
+                                <td>×{{ tier_info.multiplier }}</td>
+                                <td class="text-center">{{ 3 * tier_info.multiplier }}</td>
+                                <td class="text-center">{{ 2 * tier_info.multiplier }}</td>
+                                <td class="text-center">{{ 1 * tier_info.multiplier }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="alert alert-info mt-3 mb-0">
+                    <i class="bi bi-lightbulb"></i>
+                    <strong>Example:</strong> If you pick Slovenia (Tier 4) and they win a gold medal, 
+                    you earn 3 × 10 = <strong>30 points</strong>!
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tiebreaker -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">🔀 Tiebreaker Rules</h5>
+            </div>
+            <div class="card-body">
+                <p>If two or more players have the same total points, we break the tie using USA medal count predictions:</p>
+                
+                <ol class="mb-0">
+                    <li><strong>First:</strong> Closest guess to USA's actual <strong>Gold</strong> medal count</li>
+                    <li><strong>Then:</strong> Closest guess to USA's actual <strong>Silver</strong> medal count</li>
+                    <li><strong>Then:</strong> Closest guess to USA's actual <strong>Bronze</strong> medal count</li>
+                    <li><strong>If still tied:</strong> Co-champions! 🏆</li>
+                </ol>
+            </div>
+        </div>
+        
+        <!-- Tier 6 Notice -->
+        <div class="card mb-4 border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">⚠️ Tier 6 (Wildcard) Notice</h5>
+            </div>
+            <div class="card-body">
+                {{ tier_6_warning }}
+            </div>
+        </div>
+        
+        <!-- Deadline -->
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">⏰ Deadline</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-0">
+                    All picks must be submitted by <strong>February 6, 2026 at 11:59 PM Central Time</strong>.
+                    <br><br>
+                    You can edit your picks unlimited times before the deadline. After the deadline, 
+                    all picks are locked and visible to everyone.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <div class="card sticky-top" style="top: 1rem;">
+            <div class="card-header bg-dark text-white">
+                <h6 class="mb-0">Quick Reference</h6>
+            </div>
+            <div class="card-body">
+                <p><strong>Total Picks:</strong> 8</p>
+                <p><strong>Deadline:</strong> Feb 6, 2026 @ 11:59 PM CT</p>
+                <p><strong>Tiebreaker:</strong> USA medal guesses</p>
+                
+                <hr>
+                
+                <h6>Multipliers:</h6>
+                <ul class="list-unstyled mb-0">
+                    <li>Tier 1: ×1</li>
+                    <li>Tier 2: ×2</li>
+                    <li>Tier 3: ×3</li>
+                    <li>Tier 4: ×6</li>
+                    <li>Tier 5: ×10</li>
+                    <li>Tier 6: ×20</li>
+                </ul>
+            </div>
+            <div class="card-footer">
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('edit_picks') }}" class="btn btn-primary w-100">Make Your Picks</a>
+                {% else %}
+                <a href="{{ url_for('register') }}" class="btn btn-primary w-100">Sign Up to Play</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

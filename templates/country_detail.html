@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}{{ country.name }} - {{ app_name }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('countries') }}">Countries</a></li>
+        <li class="breadcrumb-item active">{{ country.name }}</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">{{ country.name }} ({{ country.code }})</h3>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-sm-6">
+                        <p><strong>Tier:</strong> {{ country.tier }} ({{ country.tier_name }})</p>
+                        <p><strong>Multiplier:</strong> ×{{ country.multiplier }}</p>
+                        {% if not country.has_medaled_2010_2022 %}
+                        <p class="text-warning">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            Has not medaled in Winter Olympics 2010-2022
+                        </p>
+                        {% endif %}
+                    </div>
+                    <div class="col-sm-6">
+                        <p><strong>Points per medal:</strong></p>
+                        <ul>
+                            <li>🥇 Gold: {{ 3 * country.multiplier }} pts</li>
+                            <li>🥈 Silver: {{ 2 * country.multiplier }} pts</li>
+                            <li>🥉 Bronze: {{ 1 * country.multiplier }} pts</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                {% if picks_locked %}
+                <h5>2026 Medal Count</h5>
+                <div class="row text-center mb-4">
+                    <div class="col-3">
+                        <div class="fs-1">🥇</div>
+                        <div class="fs-3 fw-bold">{{ country.gold_count }}</div>
+                        <small class="text-muted">Gold</small>
+                    </div>
+                    <div class="col-3">
+                        <div class="fs-1">🥈</div>
+                        <div class="fs-3 fw-bold">{{ country.silver_count }}</div>
+                        <small class="text-muted">Silver</small>
+                    </div>
+                    <div class="col-3">
+                        <div class="fs-1">🥉</div>
+                        <div class="fs-3 fw-bold">{{ country.bronze_count }}</div>
+                        <small class="text-muted">Bronze</small>
+                    </div>
+                    <div class="col-3">
+                        <div class="fs-1">🏅</div>
+                        <div class="fs-3 fw-bold">{{ country.total_medals }}</div>
+                        <small class="text-muted">Total</small>
+                    </div>
+                </div>
+                
+                <div class="alert alert-success">
+                    <strong>Total Points:</strong> {{ country.calculate_points() }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if picks_locked and picked_by %}
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">Players Who Picked {{ country.name }}</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    {% for user in picked_by %}
+                    <li class="mb-1">
+                        <a href="{{ url_for('user_detail', user_id=user.id) }}">
+                            {{ user.get_display_name() }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Quick Stats</h6>
+            </div>
+            <div class="card-body">
+                <p><strong>Tier {{ country.tier }}</strong> - {{ country.tier_name }}</p>
+                <p>×{{ country.multiplier }} point multiplier</p>
+                {% if picks_locked %}
+                <p><strong>{{ country.calculate_points() }}</strong> points earned</p>
+                <p><strong>{{ picked_by|length }}</strong> players picked this country</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

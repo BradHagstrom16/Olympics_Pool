@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Users - {{ app_name }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}">Admin</a></li>
+        <li class="breadcrumb-item active">Users</li>
+    </ol>
+</nav>
+
+<h2><i class="bi bi-people"></i> Manage Users</h2>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Username</th>
+                        <th>Display Name</th>
+                        <th>Email</th>
+                        <th class="text-center">Picks Ready</th>
+                        <th class="text-center">Points</th>
+                        <th class="text-center">Admin</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td><strong>{{ user.username }}</strong></td>
+                        <td>{{ user.display_name or '-' }}</td>
+                        <td>{{ user.email }}</td>
+                        <td class="text-center">
+                            {% if user.is_ready() %}
+                            <span class="badge bg-success">✓</span>
+                            {% else %}
+                            <span class="badge bg-warning text-dark">✗</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">{{ user.total_points }}</td>
+                        <td class="text-center">
+                            {% if user.is_admin %}
+                            <span class="badge bg-warning text-dark">Admin</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-warning" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#resetModal{{ user.id }}">
+                                Reset Password
+                            </button>
+                        </td>
+                    </tr>
+                    
+                    <!-- Password Reset Modal -->
+                    <div class="modal fade" id="resetModal{{ user.id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Reset Password: {{ user.get_display_name() }}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form method="POST" action="{{ url_for('admin_reset_password', user_id=user.id) }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label class="form-label">New Password</label>
+                                            <input type="text" class="form-control" name="new_password" 
+                                                   value="olympics{{ user.id }}" required minlength="6">
+                                            <small class="text-muted">Default: olympics{{ user.id }}</small>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-warning">Reset Password</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">← Back to Dashboard</a>
+</div>
+{% endblock %}

@@ -1,0 +1,311 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Picks - {{ app_name }}{% endblock %}
+
+{% block head %}
+<style>
+    .tier-section {
+        border-left: 4px solid;
+        margin-bottom: 1.5rem;
+    }
+    .tier-1 { border-color: #ffd700; }
+    .tier-2 { border-color: #c0c0c0; }
+    .tier-3 { border-color: #cd7f32; }
+    .tier-4 { border-color: #4a90d9; }
+    .tier-5 { border-color: #7b68ee; }
+    .tier-6 { border-color: #20c997; }
+    
+    .country-checkbox {
+        cursor: pointer;
+        padding: 0.5rem 1rem;
+        border-radius: 0.375rem;
+        margin-bottom: 0.25rem;
+        transition: background-color 0.15s;
+    }
+    .country-checkbox:hover {
+        background-color: #f8f9fa;
+    }
+    .country-checkbox input:checked + label {
+        font-weight: bold;
+    }
+    .country-checkbox.selected {
+        background-color: #d1e7dd;
+    }
+    .never-medaled {
+        opacity: 0.8;
+    }
+    .tier-6-search {
+        position: sticky;
+        top: 0;
+        background: white;
+        padding: 0.5rem 0;
+        z-index: 10;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <h2><i class="bi bi-pencil-square"></i> Make Your Picks</h2>
+        <p class="text-muted">Select countries from each tier. Lower tiers have higher point multipliers!</p>
+        
+        <form method="POST" id="picks-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            {% for tier_num in range(1, 7) %}
+            {% set tier_info = tiers[tier_num] %}
+            {% set countries = countries_by_tier[tier_num] %}
+            {% set current_tier_picks = current_picks.get(tier_num, []) %}
+            
+            <div class="card tier-section tier-{{ tier_num }}">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-0">
+                            Tier {{ tier_num }}: {{ tier_info.name }}
+                            <span class="badge bg-secondary ms-2">Pick {{ tier_info.picks }}</span>
+                        </h5>
+                        <small class="text-muted">
+                            Points: 🥇{{ 3 * tier_info.multiplier }} | 🥈{{ 2 * tier_info.multiplier }} | 🥉{{ 1 * tier_info.multiplier }}
+                            (×{{ tier_info.multiplier }} multiplier)
+                        </small>
+                    </div>
+                    <div class="tier-counter">
+                        <span class="badge bg-primary" id="tier-{{ tier_num }}-count">
+                            {{ current_tier_picks|length }} / {{ tier_info.picks }}
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if tier_num == 6 %}
+                    <!-- Tier 6 Warning -->
+                    <div class="alert alert-warning mb-3">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>Wildcard Tier Notice:</strong>
+                        Not all countries in Tier 6 have recent Olympic medal history. 
+                        Countries marked with ⚪ have not won a medal in the last four Winter Olympics (2010–2022). 
+                        Choose wisely—or boldly.
+                    </div>
+                    
+                    <!-- Search box for Tier 6 -->
+                    <div class="tier-6-search mb-3">
+                        <input type="text" class="form-control" id="tier-6-search" 
+                               placeholder="🔍 Search countries...">
+                    </div>
+                    {% endif %}
+                    
+                    <div class="row" id="tier-{{ tier_num }}-countries">
+                        {% for country in countries %}
+                        <div class="col-md-6 col-lg-4 country-item" data-name="{{ country.name|lower }}">
+                            <div class="country-checkbox {% if country.id in current_tier_picks %}selected{% endif %} {% if not country.has_medaled_2010_2022 %}never-medaled{% endif %}">
+                                <div class="form-check">
+                                    <input class="form-check-input tier-checkbox" 
+                                           type="checkbox" 
+                                           name="tier_{{ tier_num }}" 
+                                           value="{{ country.id }}"
+                                           id="country-{{ country.id }}"
+                                           data-tier="{{ tier_num }}"
+                                           data-max="{{ tier_info.picks }}"
+                                           {% if country.id in current_tier_picks %}checked{% endif %}>
+                                    <label class="form-check-label w-100" for="country-{{ country.id }}">
+                                        {{ country.name }}
+                                        {% if not country.has_medaled_2010_2022 %}
+                                        <span class="text-muted" title="Has not medaled 2010-2022">⚪</span>
+                                        {% endif %}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            
+            <!-- Tiebreaker Section -->
+            <div class="card border-info mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-shuffle"></i> Tiebreaker: USA Medal Predictions</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">
+                        In case of a tie, the closest guess to USA's actual medal count wins.
+                        We check gold first, then silver, then bronze.
+                    </p>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="usa_gold" class="form-label">🥇 USA Gold Medals</label>
+                            <input type="number" class="form-control" id="usa_gold" name="usa_gold" 
+                                   min="0" max="50" required
+                                   value="{{ tiebreaker.usa_gold if tiebreaker else '' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="usa_silver" class="form-label">🥈 USA Silver Medals</label>
+                            <input type="number" class="form-control" id="usa_silver" name="usa_silver" 
+                                   min="0" max="50" required
+                                   value="{{ tiebreaker.usa_silver if tiebreaker else '' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="usa_bronze" class="form-label">🥉 USA Bronze Medals</label>
+                            <input type="number" class="form-control" id="usa_bronze" name="usa_bronze" 
+                                   min="0" max="50" required
+                                   value="{{ tiebreaker.usa_bronze if tiebreaker else '' }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Submit Button -->
+            <div class="d-grid gap-2 mb-4">
+                <button type="submit" class="btn btn-primary btn-lg" id="submit-btn">
+                    <i class="bi bi-check-circle"></i> Save My Picks
+                </button>
+                <a href="{{ url_for('my_picks') }}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Sidebar: Summary -->
+    <div class="col-lg-4">
+        <div class="card sticky-top" style="top: 1rem;">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"><i class="bi bi-list-check"></i> Your Selections</h5>
+            </div>
+            <div class="card-body">
+                <div id="picks-summary">
+                    {% for tier_num in range(1, 7) %}
+                    <div class="mb-2">
+                        <strong>Tier {{ tier_num }}:</strong>
+                        <span id="summary-tier-{{ tier_num }}" class="text-muted">
+                            {% if current_picks.get(tier_num) %}
+                                {{ current_picks[tier_num]|length }} selected
+                            {% else %}
+                                None selected
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <hr>
+                
+                <div class="alert alert-info mb-0">
+                    <i class="bi bi-lightbulb"></i>
+                    <strong>Tip:</strong> You can edit your picks anytime before the deadline!
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle checkbox limits per tier
+    document.querySelectorAll('.tier-checkbox').forEach(function(checkbox) {
+        checkbox.addEventListener('change', function() {
+            const tier = this.dataset.tier;
+            const max = parseInt(this.dataset.max);
+            const checked = document.querySelectorAll(`input[name="tier_${tier}"]:checked`);
+            
+            // Update counter
+            document.getElementById(`tier-${tier}-count`).textContent = `${checked.length} / ${max}`;
+            
+            // Update visual state
+            const container = this.closest('.country-checkbox');
+            if (this.checked) {
+                container.classList.add('selected');
+            } else {
+                container.classList.remove('selected');
+            }
+            
+            // If over limit, uncheck and alert
+            if (checked.length > max) {
+                this.checked = false;
+                container.classList.remove('selected');
+                document.getElementById(`tier-${tier}-count`).textContent = `${max} / ${max}`;
+                alert(`You can only select ${max} country(ies) from Tier ${tier}.`);
+            }
+            
+            updateSummary();
+        });
+    });
+    
+    // Tier 6 search functionality
+    const searchInput = document.getElementById('tier-6-search');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase();
+            const items = document.querySelectorAll('#tier-6-countries .country-item');
+            
+            items.forEach(function(item) {
+                const name = item.dataset.name;
+                if (name.includes(query)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    }
+    
+    // Update summary
+    function updateSummary() {
+        for (let tier = 1; tier <= 6; tier++) {
+            const checked = document.querySelectorAll(`input[name="tier_${tier}"]:checked`);
+            const summaryEl = document.getElementById(`summary-tier-${tier}`);
+            
+            if (checked.length > 0) {
+                const names = [];
+                checked.forEach(function(cb) {
+                    const label = document.querySelector(`label[for="${cb.id}"]`);
+                    names.push(label.textContent.trim().replace('⚪', '').trim());
+                });
+                summaryEl.innerHTML = names.join(', ');
+                summaryEl.classList.remove('text-muted');
+            } else {
+                summaryEl.innerHTML = 'None selected';
+                summaryEl.classList.add('text-muted');
+            }
+        }
+    }
+    
+    // Form validation
+    document.getElementById('picks-form').addEventListener('submit', function(e) {
+        const tiers = {{ tiers|tojson }};
+        let valid = true;
+        let message = '';
+        
+        for (let tier = 1; tier <= 6; tier++) {
+            const required = tiers[tier].picks;
+            const selected = document.querySelectorAll(`input[name="tier_${tier}"]:checked`).length;
+            
+            if (selected !== required) {
+                valid = false;
+                message += `Tier ${tier} requires ${required} pick(s), you have ${selected}.\n`;
+            }
+        }
+        
+        // Check tiebreaker
+        const gold = document.getElementById('usa_gold').value;
+        const silver = document.getElementById('usa_silver').value;
+        const bronze = document.getElementById('usa_bronze').value;
+        
+        if (!gold || !silver || !bronze) {
+            valid = false;
+            message += 'Please enter your USA medal predictions for the tiebreaker.';
+        }
+        
+        if (!valid) {
+            e.preventDefault();
+            alert(message);
+        }
+    });
+    
+    // Initialize summary
+    updateSummary();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}All Picks - {{ app_name }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}">Admin</a></li>
+        <li class="breadcrumb-item active">All Picks</li>
+    </ol>
+</nav>
+
+<h2><i class="bi bi-list-check"></i> All Player Picks</h2>
+
+{% if picks_data %}
+<div class="accordion" id="picksAccordion">
+    {% for data in picks_data %}
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" 
+                    data-bs-toggle="collapse" data-bs-target="#picks{{ data.user.id }}">
+                <span class="me-3">
+                    <strong>{{ data.user.get_display_name() }}</strong>
+                </span>
+                <span class="badge bg-primary me-2">{{ data.total_points }} pts</span>
+                {% if data.tiebreaker %}
+                <span class="badge bg-info">TB: {{ data.tiebreaker.usa_gold }}/{{ data.tiebreaker.usa_silver }}/{{ data.tiebreaker.usa_bronze }}</span>
+                {% endif %}
+            </button>
+        </h2>
+        <div id="picks{{ data.user.id }}" class="accordion-collapse collapse" data-bs-parent="#picksAccordion">
+            <div class="accordion-body">
+                <div class="row">
+                    {% for tier_num in range(1, 7) %}
+                    <div class="col-md-4 col-lg-2 mb-3">
+                        <h6 class="text-muted">Tier {{ tier_num }}</h6>
+                        {% for pick in data.picks_by_tier[tier_num] %}
+                        <div class="mb-1">
+                            <strong>{{ pick.country.name }}</strong>
+                            <br>
+                            <small class="text-success">{{ pick.country.calculate_points() }} pts</small>
+                        </div>
+                        {% else %}
+                        <span class="text-muted">—</span>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">
+    No picks have been submitted yet.
+</div>
+{% endif %}
+
+<div class="mt-3">
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">← Back to Dashboard</a>
+</div>
+{% endblock %}
