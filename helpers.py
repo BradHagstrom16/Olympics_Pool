@@ -120,6 +120,11 @@ def register_template_helpers(app):
             f"🥇 {country.gold_count} | 🥈 {country.silver_count} | 🥉 {country.bronze_count}"
         )
 
+    @app.template_filter('iso')
+    def iso_code_filter(ioc_code):
+        """Convert IOC code to ISO 3166-1 alpha-2 code for flag assets."""
+        return get_iso_code(ioc_code)
+
     @app.template_global()
     def medal_points(country):
         """
