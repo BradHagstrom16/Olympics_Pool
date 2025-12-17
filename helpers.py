@@ -1,6 +1,8 @@
 """
 2026 Milano-Cortina Winter Olympics Pool - Template Helpers
 ============================================================
+FIXED VERSION - Addresses flag emoji display issues
+
 Utility functions for flags and display formatting.
 """
 
@@ -107,6 +109,10 @@ def ioc_to_flag_emoji(ioc_code: str) -> str:
     Returns:
         Flag emoji string, or empty string if not found
     """
+    if not ioc_code:
+        return ''
+    
+    # Get ISO code from mapping
     iso_code = IOC_TO_ISO.get(ioc_code.upper())
     
     if not iso_code:
@@ -120,10 +126,26 @@ def ioc_to_flag_emoji(ioc_code: str) -> str:
         flag = ''
         for char in iso_code.upper():
             # 0x1F1E6 is the Unicode code point for regional indicator A
-            flag += chr(0x1F1E6 + ord(char) - ord('A'))
+            code_point = 0x1F1E6 + ord(char) - ord('A')
+            flag += chr(code_point)
         return flag
     except (ValueError, TypeError):
         return ''
+
+
+def get_iso_code(ioc_code: str) -> str:
+    """
+    Get ISO code from IOC code.
+    
+    Args:
+        ioc_code: Three-letter IOC country code
+    
+    Returns:
+        Two-letter ISO code (lowercase)
+    """
+    if not ioc_code:
+        return ''
+    return IOC_TO_ISO.get(ioc_code.upper(), ioc_code[:2]).lower()
 
 
 def get_flag_class(ioc_code: str) -> str:
@@ -136,7 +158,7 @@ def get_flag_class(ioc_code: str) -> str:
     Returns:
         CSS class string for flag-icons (e.g., 'fi fi-us')
     """
-    iso_code = IOC_TO_ISO.get(ioc_code.upper(), ioc_code[:2]).lower()
+    iso_code = get_iso_code(ioc_code)
     return f'fi fi-{iso_code}'
 
 
@@ -150,16 +172,69 @@ FLAG_EMOJI_LOOKUP = {
 def register_template_helpers(app):
     """Register Jinja2 template filters and globals."""
     
+    from markupsafe import Markup
+    
     @app.template_filter('flag')
     def flag_filter(ioc_code):
-        """Jinja2 filter to convert IOC code to flag emoji."""
-        return ioc_to_flag_emoji(ioc_code)
+        """
+        Jinja2 filter to convert IOC code to flag emoji.
+        Usage: {{ country.code|flag }}
+        Returns: Flag emoji (e.g., 🇺🇸) as safe HTML
+        """
+        emoji = ioc_to_flag_emoji(ioc_code)
+        # Mark as safe to prevent escaping
+        return Markup(emoji) if emoji else ''
+    
+    @app.template_filter('flag_img')
+    def flag_img_filter(ioc_code, size='1em'):
+        """
+        Jinja2 filter to get flag as an <img> tag using flag-icons CDN.
+        This is a fallback if emoji flags don't render properly.
+        
+        Usage: {{ country.code|flag_img }}
+        Usage: {{ country.code|flag_img('2em') }}
+        """
+        iso_code = get_iso_code(ioc_code)
+        if not iso_code:
+            return ''
+        # Using flagcdn.com for reliable flag images
+        url = f'https://flagcdn.com/w40/{iso_code}.png'
+        return Markup(f'<img src="{url}" alt="{ioc_code}" style="height:{size};vertical-align:middle;">')
     
     @app.template_filter('flag_class')
     def flag_class_filter(ioc_code):
         """Jinja2 filter to get flag-icons CSS class."""
         return get_flag_class(ioc_code)
     
+    @app.template_filter('iso')
+    def iso_filter(ioc_code):
+        """Jinja2 filter to convert IOC code to ISO code."""
+        return get_iso_code(ioc_code)
+    
     # Add to template globals
     app.jinja_env.globals['flag_emoji'] = ioc_to_flag_emoji
     app.jinja_env.globals['FLAG_LOOKUP'] = FLAG_EMOJI_LOOKUP
+    app.jinja_env.globals['IOC_TO_ISO'] = IOC_TO_ISO
+
+
+# =============================================================================
+# DEBUGGING / TESTING
+# =============================================================================
+
+def test_flag_emoji():
+    """Test function to verify flag emoji generation."""
+    test_codes = ['USA', 'NOR', 'GER', 'CAN', 'ITA', 'JPN']
+    print("Flag Emoji Test:")
+    print("-" * 40)
+    for code in test_codes:
+        emoji = ioc_to_flag_emoji(code)
+        iso = IOC_TO_ISO.get(code, 'N/A')
+        # Show the actual Unicode code points
+        hex_codes = ' '.join(f'U+{ord(c):04X}' for c in emoji)
+        print(f"{code} -> {iso} -> {emoji} ({hex_codes})")
+    print("-" * 40)
+
+
+if __name__ == '__main__':
+    # Run test when executed directly
+    test_flag_emoji()
