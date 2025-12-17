@@ -38,13 +38,19 @@
                 <div class="card h-100 {% if not country.has_medaled_2010_2022 %}border-secondary{% endif %}">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2">
-                            <!-- Large Flag Emoji -->
-                            <span class="flag-emoji flag-emoji-lg me-2">{{ country.code|flag }}</span>
+                            <!-- FLAG: Using image-based flag (more reliable than emoji) -->
+                            <img src="https://flagcdn.com/w80/{{ country.code|iso }}.png" 
+                                 alt="{{ country.name }}" 
+                                 class="me-2"
+                                 style="height: 2rem; border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">
                             <div>
                                 <h6 class="card-title mb-0">
                                     {{ country.name }}
                                     {% if not country.has_medaled_2010_2022 %}
                                     <span title="Has not medaled 2010-2022">⚪</span>
+                                    {% endif %}
+                                    {% if country.code == 'ITA' %}
+                                    <span title="Host Nation">⭐</span>
                                     {% endif %}
                                 </h6>
                                 <small class="text-muted">{{ country.code }}</small>
