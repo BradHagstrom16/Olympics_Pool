@@ -31,107 +31,169 @@
     display: inline-flex;
     align-items: center;
     position: relative;
-    width: 100px;
-    height: 48px;
+    width: 88px;    /* Tighter overall width */
+    height: 40px;
 }
 
 .olympic-rings .ring {
     position: absolute;
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
     border: 3px solid;
     background: transparent;
 }
 
-/* Top row of rings */
+/* Top row of rings - tighter spacing */
 .olympic-rings .ring-blue {
     border-color: var(--ring-blue);
     left: 0;
     top: 0;
-    z-index: 1;
+    z-index: 5;
 }
 
 .olympic-rings .ring-black {
     border-color: var(--ring-black);
-    left: 24px;
+    left: 21px;     /* Overlaps blue by ~5px */
     top: 0;
-    z-index: 3;
+    z-index: 4;
 }
 
 .olympic-rings .ring-red {
     border-color: var(--ring-red);
-    left: 48px;
+    left: 42px;     /* Overlaps black by ~5px */
     top: 0;
-    z-index: 1;
+    z-index: 3;
 }
 
-/* Bottom row of rings (interlocking) */
+/* Bottom row - offset and interlocking */
 .olympic-rings .ring-yellow {
     border-color: var(--ring-yellow);
-    left: 12px;
-    top: 14px;
+    left: 10px;     /* Centered under blue-black gap */
+    top: 12px;      /* Overlaps into top row */
     z-index: 2;
 }
 
 .olympic-rings .ring-green {
     border-color: var(--ring-green);
-    left: 36px;
-    top: 14px;
-    z-index: 2;
+    left: 31px;     /* Centered under black-red gap */
+    top: 12px;
+    z-index: 1;
 }
 
-/* Small version for navbar/inline use */
+/* Interlocking effect - clip paths for proper weaving */
+/* Blue ring goes OVER yellow */
+.olympic-rings .ring-blue::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    right: -3px;
+    width: 10px;
+    height: 10px;
+    border: 3px solid var(--ring-blue);
+    border-radius: 0 0 50% 0;
+    border-left: none;
+    border-top: none;
+    background: transparent;
+    z-index: 10;
+}
+
+
+/* =============================================================================
+   SMALL VERSION - For Navbar (corrected proportions)
+   ============================================================================= */
 .olympic-rings-sm {
-    width: 60px;
-    height: 30px;
+    width: 52px;
+    height: 24px;
 }
 
 .olympic-rings-sm .ring {
-    width: 17px;
-    height: 17px;
+    width: 16px;
+    height: 16px;
     border-width: 2px;
 }
 
-.olympic-rings-sm .ring-blue { left: 0; top: 0; }
-.olympic-rings-sm .ring-black { left: 14px; top: 0; }
-.olympic-rings-sm .ring-red { left: 28px; top: 0; }
-.olympic-rings-sm .ring-yellow { left: 7px; top: 9px; }
-.olympic-rings-sm .ring-green { left: 21px; top: 9px; }
+.olympic-rings-sm .ring-blue {
+    left: 0;
+    top: 0;
+}
 
-/* Large version for headers */
+.olympic-rings-sm .ring-black {
+    left: 13px;
+    top: 0;
+}
+
+.olympic-rings-sm .ring-red {
+    left: 26px;
+    top: 0;
+}
+
+.olympic-rings-sm .ring-yellow {
+    left: 6px;
+    top: 7px;
+}
+
+.olympic-rings-sm .ring-green {
+    left: 19px;
+    top: 7px;
+}
+
+
+/* =============================================================================
+   LARGE VERSION - For Headers/Footer
+   ============================================================================= */
 .olympic-rings-lg {
-    width: 150px;
-    height: 72px;
+    width: 130px;
+    height: 60px;
 }
 
 .olympic-rings-lg .ring {
-    width: 42px;
-    height: 42px;
+    width: 38px;
+    height: 38px;
     border-width: 4px;
 }
 
-.olympic-rings-lg .ring-blue { left: 0; top: 0; }
-.olympic-rings-lg .ring-black { left: 36px; top: 0; }
-.olympic-rings-lg .ring-red { left: 72px; top: 0; }
-.olympic-rings-lg .ring-yellow { left: 18px; top: 21px; }
-.olympic-rings-lg .ring-green { left: 54px; top: 21px; }
+.olympic-rings-lg .ring-blue {
+    left: 0;
+    top: 0;
+}
+
+.olympic-rings-lg .ring-black {
+    left: 31px;
+    top: 0;
+}
+
+.olympic-rings-lg .ring-red {
+    left: 62px;
+    top: 0;
+}
+
+.olympic-rings-lg .ring-yellow {
+    left: 15px;
+    top: 18px;
+}
+
+.olympic-rings-lg .ring-green {
+    left: 46px;
+    top: 18px;
+}
 
 /* =============================================================================
    FLAG EMOJI STYLING
    ============================================================================= */
 .flag-emoji {
-    font-size: 1.25em;
+    font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Twemoji Mozilla", sans-serif;
+    font-size: 1.5rem;
     line-height: 1;
     vertical-align: middle;
 }
 
 .flag-emoji-lg {
-    font-size: 2em;
+    font-size: 2rem;
 }
 
 .flag-emoji-sm {
-    font-size: 1em;
+    font-size: 1rem;
 }
 
 /* Country name with flag - common pattern */
@@ -145,24 +207,81 @@
     flex-shrink: 0;
 }
 
+
 /* =============================================================================
-   NAVBAR CUSTOMIZATION
+   NAVBAR - White Background with Blue Text (Fix #1)
    ============================================================================= */
 .navbar {
-    background: linear-gradient(135deg, var(--ring-blue), var(--alpine-blue)) !important;
+    background-color: #ffffff !important;
+    border-bottom: 3px solid var(--ring-blue);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.navbar-brand {
+/* Override navbar-dark styles since we're now light */
+.navbar .navbar-brand {
+    color: var(--ring-blue) !important;
     font-weight: bold;
-    font-size: 1.1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
 }
 
-.navbar-brand .olympic-rings-sm {
-    margin-right: 0.25rem;
+.navbar .navbar-brand:hover {
+    color: var(--alpine-blue) !important;
 }
+
+.navbar .nav-link {
+    color: var(--ring-blue) !important;
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link:focus {
+    color: var(--alpine-blue) !important;
+}
+
+.navbar .nav-link.active {
+    color: var(--ring-black) !important;
+    font-weight: 600;
+}
+
+/* Dropdown styling for white navbar */
+.navbar .dropdown-menu {
+    border-color: var(--ring-blue);
+}
+
+.navbar .dropdown-item:hover {
+    background-color: var(--ice-blue);
+}
+
+/* Mobile hamburger icon - needs to be dark on white background */
+.navbar .navbar-toggler {
+    border-color: var(--ring-blue);
+}
+
+.navbar .navbar-toggler-icon {
+    /* Dark hamburger icon instead of light */
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%230085c7' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* =============================================================================
+   DEADLINE BANNER - Keep the colorful Olympic-style banner
+   ============================================================================= */
+.deadline-banner {
+    background: linear-gradient(90deg, 
+        var(--ring-blue) 0%, 
+        var(--ring-yellow) 25%, 
+        var(--ring-black) 50%, 
+        var(--ring-green) 75%, 
+        var(--ring-red) 100%);
+    color: white;
+    padding: 0.5rem 0;
+    text-align: center;
+    font-weight: 500;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.deadline-banner a {
+    color: white;
+    text-decoration: underline;
+}
+
 
 /* =============================================================================
    CARD & TABLE STYLING
