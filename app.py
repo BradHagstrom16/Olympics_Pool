@@ -30,6 +30,8 @@ from models import (
 
 app = Flask(__name__)
 app.config.from_object(config[os.environ.get('FLASK_ENV', 'default')])
+from helpers import register_template_helpers
+register_template_helpers(app)
 
 # Initialize extensions
 db.init_app(app)
