@@ -199,7 +199,10 @@ def register_template_helpers(app):
             return ''
         # Using flagcdn.com for reliable flag images
         url = f'https://flagcdn.com/w40/{iso_code}.png'
-        return Markup(f'<img src="{url}" alt="{ioc_code}" style="height:{size};vertical-align:middle;">')
+        return Markup(
+            f'<img src="{url}" alt="{ioc_code}" class="flag-img" '
+            f'style="height:{size};vertical-align:middle;">'
+        )
     
     @app.template_filter('flag_class')
     def flag_class_filter(ioc_code):

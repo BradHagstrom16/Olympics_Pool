@@ -38,9 +38,9 @@
                             </span>
                         </td>
                         <td>
-                            <!-- Country with Flag Emoji -->
+                            <!-- Country with Flag (image fallback for reliability) -->
                             <span class="country-with-flag">
-                                <span class="flag-emoji">{{ country.code|flag }}</span>
+                                <span class="flag-emoji">{{ country.code|flag_img('1.5rem') }}</span>
                                 <a href="{{ url_for('country_detail', country_id=country.id) }}" class="text-decoration-none">
                                     {{ country.name }}
                                 </a>
