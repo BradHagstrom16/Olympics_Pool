@@ -196,6 +196,15 @@
     font-size: 1rem;
 }
 
+/* Flag image fallback */
+.flag-img {
+    display: inline-block;
+    height: 1.5rem;
+    width: auto;
+    border-radius: 2px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
 /* Country name with flag - common pattern */
 .country-with-flag {
     display: inline-flex;

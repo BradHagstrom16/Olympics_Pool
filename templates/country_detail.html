@@ -16,7 +16,7 @@
             <div class="card-header bg-primary text-white">
                 <div class="d-flex align-items-center">
                     <!-- Large Flag -->
-                    <span class="flag-emoji" style="font-size: 3rem; margin-right: 1rem;">{{ country.code|flag }}</span>
+                    <span class="flag-emoji" style="font-size: 3rem; margin-right: 1rem;">{{ country.code|flag_img('3rem') }}</span>
                     <div>
                         <h3 class="mb-0">{{ country.name }}</h3>
                         <span class="badge bg-light text-dark">{{ country.code }}</span>
@@ -88,7 +88,7 @@
         <div class="card mt-4">
             <div class="card-header">
                 <h5 class="mb-0">
-                    <span class="flag-emoji me-2">{{ country.code|flag }}</span>
+                    <span class="flag-emoji me-2">{{ country.code|flag_img('1.5rem') }}</span>
                     Players Who Picked {{ country.name }}
                 </h5>
             </div>
@@ -111,7 +111,7 @@
         <!-- Country Card with Large Flag -->
         <div class="card text-center mb-3">
             <div class="card-body">
-                <span class="flag-emoji" style="font-size: 5rem; line-height: 1;">{{ country.code|flag }}</span>
+                <span class="flag-emoji" style="font-size: 5rem; line-height: 1;">{{ country.code|flag_img('5rem') }}</span>
                 <h4 class="mt-3">{{ country.name }}</h4>
             </div>
         </div>
