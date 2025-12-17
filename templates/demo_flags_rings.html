@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flags & Olympic Rings Demo</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <style>
+        /* =============================================================================
+           CSS VARIABLES - Winter Olympics Theme
+           ============================================================================= */
+        :root {
+            --ring-blue: #0085c7;
+            --ring-yellow: #f4c300;
+            --ring-black: #000000;
+            --ring-green: #009f3d;
+            --ring-red: #df0024;
+            --gold: #ffd700;
+            --silver: #c0c0c0;
+            --bronze: #cd7f32;
+            --ice-blue: #e3f2fd;
+        }
+
+        /* =============================================================================
+           OLYMPIC RINGS - Pure CSS Implementation
+           ============================================================================= */
+        .olympic-rings {
+            display: inline-flex;
+            align-items: center;
+            position: relative;
+            width: 100px;
+            height: 48px;
+        }
+
+        .olympic-rings .ring {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 3px solid;
+            background: transparent;
+        }
+
+        .olympic-rings .ring-blue { border-color: var(--ring-blue); left: 0; top: 0; z-index: 1; }
+        .olympic-rings .ring-black { border-color: var(--ring-black); left: 24px; top: 0; z-index: 3; }
+        .olympic-rings .ring-red { border-color: var(--ring-red); left: 48px; top: 0; z-index: 1; }
+        .olympic-rings .ring-yellow { border-color: var(--ring-yellow); left: 12px; top: 14px; z-index: 2; }
+        .olympic-rings .ring-green { border-color: var(--ring-green); left: 36px; top: 14px; z-index: 2; }
+
+        /* Small version */
+        .olympic-rings-sm { width: 60px; height: 30px; }
+        .olympic-rings-sm .ring { width: 17px; height: 17px; border-width: 2px; }
+        .olympic-rings-sm .ring-blue { left: 0; top: 0; }
+        .olympic-rings-sm .ring-black { left: 14px; top: 0; }
+        .olympic-rings-sm .ring-red { left: 28px; top: 0; }
+        .olympic-rings-sm .ring-yellow { left: 7px; top: 9px; }
+        .olympic-rings-sm .ring-green { left: 21px; top: 9px; }
+
+        /* Large version */
+        .olympic-rings-lg { width: 150px; height: 72px; }
+        .olympic-rings-lg .ring { width: 42px; height: 42px; border-width: 4px; }
+        .olympic-rings-lg .ring-blue { left: 0; top: 0; }
+        .olympic-rings-lg .ring-black { left: 36px; top: 0; }
+        .olympic-rings-lg .ring-red { left: 72px; top: 0; }
+        .olympic-rings-lg .ring-yellow { left: 18px; top: 21px; }
+        .olympic-rings-lg .ring-green { left: 54px; top: 21px; }
+
+        /* Flag styling */
+        .flag-emoji { font-size: 1.5em; line-height: 1; vertical-align: middle; }
+        .flag-emoji-lg { font-size: 2.5em; }
+        .flag-emoji-xl { font-size: 4em; }
+        .country-with-flag { display: inline-flex; align-items: center; gap: 0.5rem; }
+
+        /* Tier badges */
+        .tier-badge { display: inline-flex; align-items: center; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-weight: 600; font-size: 0.875rem; }
+        .tier-badge-1 { background: linear-gradient(135deg, var(--gold), #daa520); color: #000; }
+        .tier-badge-2 { background: linear-gradient(135deg, var(--silver), #a0a0a0); color: #000; }
+        .tier-badge-3 { background: linear-gradient(135deg, var(--bronze), #8b4513); color: #fff; }
+        .tier-badge-4 { background: linear-gradient(135deg, var(--ring-blue), #0055a4); color: #fff; }
+        .tier-badge-5 { background: linear-gradient(135deg, #7b68ee, #6a5acd); color: #fff; }
+        .tier-badge-6 { background: linear-gradient(135deg, #20c997, #17a085); color: #fff; }
+
+        /* Medal styling */
+        .medal-gold { color: var(--gold); text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+        .medal-silver { color: var(--silver); text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+        .medal-bronze { color: var(--bronze); text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+
+        /* Navbar */
+        .navbar { background: linear-gradient(135deg, var(--ring-blue), #0066a4) !important; }
+
+        /* Animation */
+        .olympic-rings-sm { animation: gentle-pulse 4s ease-in-out infinite; }
+        @keyframes gentle-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.85; } }
+    </style>
+</head>
+<body>
+    <!-- Demo Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <div class="olympic-rings olympic-rings-sm me-2">
+                    <div class="ring ring-blue"></div>
+                    <div class="ring ring-yellow"></div>
+                    <div class="ring ring-black"></div>
+                    <div class="ring ring-green"></div>
+                    <div class="ring ring-red"></div>
+                </div>
+                <span>2026 Milano-Cortina Winter Olympics Pool</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="mb-4">🏔️ Flags & Olympic Rings Demo</h1>
+        
+        <!-- Olympic Rings Section -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Olympic Rings (Pure CSS)</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <h6>Small (Navbar)</h6>
+                        <div class="olympic-rings olympic-rings-sm mx-auto">
+                            <div class="ring ring-blue"></div>
+                            <div class="ring ring-yellow"></div>
+                            <div class="ring ring-black"></div>
+                            <div class="ring ring-green"></div>
+                            <div class="ring ring-red"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Default</h6>
+                        <div class="olympic-rings mx-auto">
+                            <div class="ring ring-blue"></div>
+                            <div class="ring ring-yellow"></div>
+                            <div class="ring ring-black"></div>
+                            <div class="ring ring-green"></div>
+                            <div class="ring ring-red"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Large (Footer)</h6>
+                        <div class="olympic-rings olympic-rings-lg mx-auto">
+                            <div class="ring ring-blue"></div>
+                            <div class="ring ring-yellow"></div>
+                            <div class="ring ring-black"></div>
+                            <div class="ring ring-green"></div>
+                            <div class="ring ring-red"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flag Emoji Section -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Country Flags (Emoji)</h5>
+            </div>
+            <div class="card-body">
+                <h6>Tier 1 - Elite</h6>
+                <div class="d-flex gap-3 mb-4 flex-wrap">
+                    <span class="country-with-flag"><span class="flag-emoji-lg">🇳🇴</span> Norway</span>
+                    <span class="country-with-flag"><span class="flag-emoji-lg">🇩🇪</span> Germany</span>
+                    <span class="country-with-flag"><span class="flag-emoji-lg">🇺🇸</span> United States</span>
+                    <span class="country-with-flag"><span class="flag-emoji-lg">🇨🇦</span> Canada</span>
+                </div>
+
+                <h6>Tier 2 - Strong</h6>
+                <div class="d-flex gap-3 mb-4 flex-wrap">
+                    <span class="country-with-flag"><span class="flag-emoji-lg">🇳🇱</span> Netherlands</span>
+                    <span class="country-with-flag"><span class="flag-emoji-lg">🇦🇹</span> Austria</span>
+                    <span class="country-with-flag"><span class="flag-emoji-lg">🇸🇪</span> Sweden</span>
+                    <span class="country-with-flag"><span class="flag-emoji-lg">🇫🇷</span> France</span>
+                    <span class="country-with-flag"><span class="flag-emoji-lg">🇨🇭</span> Switzerland</span>
+                    <span class="country-with-flag"><span class="flag-emoji-lg">🇰🇷</span> South Korea</span>
+                </div>
+
+                <h6>Tier 3 - Competitive (includes 🇮🇹 Host Nation!)</h6>
+                <div class="d-flex gap-3 mb-4 flex-wrap">
+                    <span class="country-with-flag"><span class="flag-emoji-lg">🇨🇳</span> China</span>
+                    <span class="country-with-flag"><span class="flag-emoji-lg">🇯🇵</span> Japan</span>
+                    <span class="country-with-flag"><span class="flag-emoji-lg">🇮🇹</span> <strong>Italy ⭐</strong></span>
+                </div>
+
+                <h6>Tier 4 - Emerging</h6>
+                <div class="d-flex gap-3 mb-4 flex-wrap">
+                    <span class="country-with-flag"><span class="flag-emoji-lg">🇫🇮</span> Finland</span>
+                    <span class="country-with-flag"><span class="flag-emoji-lg">🇨🇿</span> Czech Republic</span>
+                    <span class="country-with-flag"><span class="flag-emoji-lg">🇸🇮</span> Slovenia</span>
+                </div>
+
+                <h6>Tier 5 - Occasional</h6>
+                <div class="d-flex gap-3 mb-4 flex-wrap">
+                    <span class="country-with-flag"><span class="flag-emoji-lg">🇵🇱</span> Poland</span>
+                    <span class="country-with-flag"><span class="flag-emoji-lg">🇬🇧</span> Great Britain</span>
+                    <span class="country-with-flag"><span class="flag-emoji-lg">🇦🇺</span> Australia</span>
+                    <span class="country-with-flag"><span class="flag-emoji-lg">🇸🇰</span> Slovakia</span>
+                    <span class="country-with-flag"><span class="flag-emoji-lg">🇱🇻</span> Latvia</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Example Table with Flags -->
+        <div class="card mb-4">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Example Medal Table</h5>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Rank</th>
+                            <th>Country</th>
+                            <th>Tier</th>
+                            <th class="text-center">🥇</th>
+                            <th class="text-center">🥈</th>
+                            <th class="text-center">🥉</th>
+                            <th class="text-end">Points</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong class="medal-gold">1</strong></td>
+                            <td><span class="country-with-flag"><span class="flag-emoji">🇳🇴</span> Norway</span></td>
+                            <td><span class="tier-badge tier-badge-1">T1</span></td>
+                            <td class="text-center medal-gold fw-bold">16</td>
+                            <td class="text-center medal-silver">8</td>
+                            <td class="text-center medal-bronze">13</td>
+                            <td class="text-end"><span class="badge bg-success">77</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong class="medal-silver">2</strong></td>
+                            <td><span class="country-with-flag"><span class="flag-emoji">🇩🇪</span> Germany</span></td>
+                            <td><span class="tier-badge tier-badge-1">T1</span></td>
+                            <td class="text-center medal-gold fw-bold">12</td>
+                            <td class="text-center medal-silver">10</td>
+                            <td class="text-center medal-bronze">5</td>
+                            <td class="text-end"><span class="badge bg-success">61</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong class="medal-bronze">3</strong></td>
+                            <td><span class="country-with-flag"><span class="flag-emoji">🇳🇱</span> Netherlands</span></td>
+                            <td><span class="tier-badge tier-badge-2">T2</span></td>
+                            <td class="text-center medal-gold fw-bold">8</td>
+                            <td class="text-center medal-silver">5</td>
+                            <td class="text-center medal-bronze">4</td>
+                            <td class="text-end"><span class="badge bg-success">92</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>4</strong></td>
+                            <td><span class="country-with-flag"><span class="flag-emoji">🇸🇮</span> Slovenia</span></td>
+                            <td><span class="tier-badge tier-badge-4">T4</span></td>
+                            <td class="text-center medal-gold fw-bold">2</td>
+                            <td class="text-center medal-silver">1</td>
+                            <td class="text-center medal-bronze">0</td>
+                            <td class="text-end"><span class="badge bg-success">48</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tier Badges -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Tier Badges</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex gap-3 flex-wrap">
+                    <span class="tier-badge tier-badge-1">Tier 1 - Elite</span>
+                    <span class="tier-badge tier-badge-2">Tier 2 - Strong</span>
+                    <span class="tier-badge tier-badge-3">Tier 3 - Competitive</span>
+                    <span class="tier-badge tier-badge-4">Tier 4 - Emerging</span>
+                    <span class="tier-badge tier-badge-5">Tier 5 - Occasional</span>
+                    <span class="tier-badge tier-badge-6">Tier 6 - Wildcard</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer with Olympic Rings -->
+        <footer class="bg-light py-4 mt-5 border-top text-center">
+            <div class="d-flex justify-content-center mb-3">
+                <div class="olympic-rings">
+                    <div class="ring ring-blue"></div>
+                    <div class="ring ring-yellow"></div>
+                    <div class="ring ring-black"></div>
+                    <div class="ring ring-green"></div>
+                    <div class="ring ring-red"></div>
+                </div>
+            </div>
+            <p class="mb-1">2026 Milano-Cortina Winter Olympics Pool</p>
+            <p class="small text-muted mb-0">
+                <span class="flag-emoji">🇮🇹</span> February 6-22, 2026 • Milano-Cortina, Italy
+            </p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

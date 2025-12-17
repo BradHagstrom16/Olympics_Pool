@@ -14,7 +14,15 @@
     <div class="col-lg-8">
         <div class="card">
             <div class="card-header bg-primary text-white">
-                <h3 class="mb-0">{{ country.name }} ({{ country.code }})</h3>
+                <div class="d-flex align-items-center">
+                    <!-- Large Flag -->
+                    <span class="flag-emoji" style="font-size: 3rem; margin-right: 1rem;">{{ country.code|flag }}</span>
+                    <div>
+                        <h3 class="mb-0">{{ country.name }}</h3>
+                        <span class="badge bg-light text-dark">{{ country.code }}</span>
+                        <span class="tier-badge tier-badge-{{ country.tier }} ms-2">Tier {{ country.tier }}</span>
+                    </div>
+                </div>
             </div>
             <div class="card-body">
                 <div class="row mb-4">
@@ -27,13 +35,19 @@
                             Has not medaled in Winter Olympics 2010-2022
                         </p>
                         {% endif %}
+                        {% if country.code == 'ITA' %}
+                        <p class="text-info">
+                            <i class="bi bi-star-fill"></i>
+                            <strong>2026 Host Nation!</strong>
+                        </p>
+                        {% endif %}
                     </div>
                     <div class="col-sm-6">
                         <p><strong>Points per medal:</strong></p>
                         <ul>
-                            <li>🥇 Gold: {{ 3 * country.multiplier }} pts</li>
-                            <li>🥈 Silver: {{ 2 * country.multiplier }} pts</li>
-                            <li>🥉 Bronze: {{ 1 * country.multiplier }} pts</li>
+                            <li><span class="medal-gold">🥇 Gold:</span> {{ 3 * country.multiplier }} pts</li>
+                            <li><span class="medal-silver">🥈 Silver:</span> {{ 2 * country.multiplier }} pts</li>
+                            <li><span class="medal-bronze">🥉 Bronze:</span> {{ 1 * country.multiplier }} pts</li>
                         </ul>
                     </div>
                 </div>
@@ -42,17 +56,17 @@
                 <h5>2026 Medal Count</h5>
                 <div class="row text-center mb-4">
                     <div class="col-3">
-                        <div class="fs-1">🥇</div>
+                        <div class="fs-1 medal-gold">🥇</div>
                         <div class="fs-3 fw-bold">{{ country.gold_count }}</div>
                         <small class="text-muted">Gold</small>
                     </div>
                     <div class="col-3">
-                        <div class="fs-1">🥈</div>
+                        <div class="fs-1 medal-silver">🥈</div>
                         <div class="fs-3 fw-bold">{{ country.silver_count }}</div>
                         <small class="text-muted">Silver</small>
                     </div>
                     <div class="col-3">
-                        <div class="fs-1">🥉</div>
+                        <div class="fs-1 medal-bronze">🥉</div>
                         <div class="fs-3 fw-bold">{{ country.bronze_count }}</div>
                         <small class="text-muted">Bronze</small>
                     </div>
@@ -73,14 +87,17 @@
         {% if picks_locked and picked_by %}
         <div class="card mt-4">
             <div class="card-header">
-                <h5 class="mb-0">Players Who Picked {{ country.name }}</h5>
+                <h5 class="mb-0">
+                    <span class="flag-emoji me-2">{{ country.code|flag }}</span>
+                    Players Who Picked {{ country.name }}
+                </h5>
             </div>
             <div class="card-body">
                 <ul class="list-unstyled mb-0">
                     {% for user in picked_by %}
-                    <li class="mb-1">
-                        <a href="{{ url_for('user_detail', user_id=user.id) }}">
-                            {{ user.get_display_name() }}
+                    <li class="mb-2">
+                        <a href="{{ url_for('user_detail', user_id=user.id) }}" class="text-decoration-none">
+                            <i class="bi bi-person"></i> {{ user.get_display_name() }}
                         </a>
                     </li>
                     {% endfor %}
@@ -91,6 +108,14 @@
     </div>
     
     <div class="col-lg-4">
+        <!-- Country Card with Large Flag -->
+        <div class="card text-center mb-3">
+            <div class="card-body">
+                <span class="flag-emoji" style="font-size: 5rem; line-height: 1;">{{ country.code|flag }}</span>
+                <h4 class="mt-3">{{ country.name }}</h4>
+            </div>
+        </div>
+        
         <div class="card">
             <div class="card-header">
                 <h6 class="mb-0">Quick Stats</h6>

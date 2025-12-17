@@ -32,18 +32,26 @@
                 <tbody>
                     {% for country in countries %}
                     <tr>
-                        <td><strong>{{ loop.index }}</strong></td>
                         <td>
-                            <a href="{{ url_for('country_detail', country_id=country.id) }}" class="text-decoration-none">
-                                {{ country.name }}
-                            </a>
+                            <span class="leaderboard-rank leaderboard-rank-{{ loop.index if loop.index <= 3 else '' }}">
+                                {{ loop.index }}
+                            </span>
                         </td>
                         <td>
-                            <span class="badge bg-secondary">T{{ country.tier }}</span>
+                            <!-- Country with Flag Emoji -->
+                            <span class="country-with-flag">
+                                <span class="flag-emoji">{{ country.code|flag }}</span>
+                                <a href="{{ url_for('country_detail', country_id=country.id) }}" class="text-decoration-none">
+                                    {{ country.name }}
+                                </a>
+                            </span>
                         </td>
-                        <td class="text-center fw-bold">{{ country.gold_count }}</td>
-                        <td class="text-center">{{ country.silver_count }}</td>
-                        <td class="text-center">{{ country.bronze_count }}</td>
+                        <td>
+                            <span class="tier-badge tier-badge-{{ country.tier }}">T{{ country.tier }}</span>
+                        </td>
+                        <td class="text-center fw-bold medal-gold">{{ country.gold_count }}</td>
+                        <td class="text-center medal-silver">{{ country.silver_count }}</td>
+                        <td class="text-center medal-bronze">{{ country.bronze_count }}</td>
                         <td class="text-center"><strong>{{ country.total_medals }}</strong></td>
                         <td class="text-end">
                             <span class="badge bg-success">{{ country.calculate_points() }}</span>

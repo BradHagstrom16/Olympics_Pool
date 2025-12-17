@@ -12,19 +12,26 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     
-    <!-- Custom CSS -->
+    <!-- Custom CSS with Olympic Rings & Flags -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     
     {% block head %}{% endblock %}
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
-                <span class="me-2">🏔️</span>
-                <span class="d-none d-sm-inline">{{ app_name }}</span>
-                <span class="d-inline d-sm-none">{{ app_short_name }}</span>
+                <!-- Olympic Rings (Small) -->
+                <div class="olympic-rings olympic-rings-sm me-2">
+                    <div class="ring ring-blue"></div>
+                    <div class="ring ring-yellow"></div>
+                    <div class="ring ring-black"></div>
+                    <div class="ring ring-green"></div>
+                    <div class="ring ring-red"></div>
+                </div>
+                <span class="d-none d-md-inline">{{ app_name }}</span>
+                <span class="d-inline d-md-none">{{ app_short_name }}</span>
             </a>
             
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -143,10 +150,23 @@
     <!-- Footer -->
     <footer class="bg-light py-4 mt-5 border-top">
         <div class="container text-center text-muted">
+            <!-- Olympic Rings (Large, centered) -->
+            <div class="footer-rings">
+                <div class="olympic-rings">
+                    <div class="ring ring-blue"></div>
+                    <div class="ring ring-yellow"></div>
+                    <div class="ring ring-black"></div>
+                    <div class="ring ring-green"></div>
+                    <div class="ring ring-red"></div>
+                </div>
+            </div>
+            
             <p class="mb-1">
-                🏔️ {{ app_name }}
+                {{ app_name }}
             </p>
             <p class="small mb-0">
+                <!-- Flag of Italy (Host Nation) -->
+                <span class="flag-emoji">{{ '🇮🇹' }}</span>
                 February 6-22, 2026 • Milano-Cortina, Italy
             </p>
             {% if game_state.medals_updated_at %}
