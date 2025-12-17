@@ -1,27 +1,172 @@
 /* 2026 Milano-Cortina Winter Olympics Pool - Custom Styles */
+/* Updated with Olympic Rings and Flag support */
 
-/* Color scheme - Winter Olympics inspired */
+/* =============================================================================
+   CSS VARIABLES - Winter Olympics Theme
+   ============================================================================= */
 :root {
-    --olympics-blue: #0085c7;
-    --olympics-yellow: #f4c300;
-    --olympics-black: #000000;
-    --olympics-green: #009f3d;
-    --olympics-red: #df0024;
+    /* Official Olympic Ring Colors */
+    --ring-blue: #0085c7;
+    --ring-yellow: #f4c300;
+    --ring-black: #000000;
+    --ring-green: #009f3d;
+    --ring-red: #df0024;
+    
+    /* Winter theme colors */
     --snow-white: #f8f9fa;
     --ice-blue: #e3f2fd;
+    --alpine-blue: #0066a4;
+    --mountain-gray: #6c757d;
+    
+    /* Medal colors */
+    --gold: #ffd700;
+    --silver: #c0c0c0;
+    --bronze: #cd7f32;
 }
 
-/* Navbar customization */
+/* =============================================================================
+   OLYMPIC RINGS - Pure CSS Implementation
+   ============================================================================= */
+.olympic-rings {
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+    width: 100px;
+    height: 48px;
+}
+
+.olympic-rings .ring {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 3px solid;
+    background: transparent;
+}
+
+/* Top row of rings */
+.olympic-rings .ring-blue {
+    border-color: var(--ring-blue);
+    left: 0;
+    top: 0;
+    z-index: 1;
+}
+
+.olympic-rings .ring-black {
+    border-color: var(--ring-black);
+    left: 24px;
+    top: 0;
+    z-index: 3;
+}
+
+.olympic-rings .ring-red {
+    border-color: var(--ring-red);
+    left: 48px;
+    top: 0;
+    z-index: 1;
+}
+
+/* Bottom row of rings (interlocking) */
+.olympic-rings .ring-yellow {
+    border-color: var(--ring-yellow);
+    left: 12px;
+    top: 14px;
+    z-index: 2;
+}
+
+.olympic-rings .ring-green {
+    border-color: var(--ring-green);
+    left: 36px;
+    top: 14px;
+    z-index: 2;
+}
+
+/* Small version for navbar/inline use */
+.olympic-rings-sm {
+    width: 60px;
+    height: 30px;
+}
+
+.olympic-rings-sm .ring {
+    width: 17px;
+    height: 17px;
+    border-width: 2px;
+}
+
+.olympic-rings-sm .ring-blue { left: 0; top: 0; }
+.olympic-rings-sm .ring-black { left: 14px; top: 0; }
+.olympic-rings-sm .ring-red { left: 28px; top: 0; }
+.olympic-rings-sm .ring-yellow { left: 7px; top: 9px; }
+.olympic-rings-sm .ring-green { left: 21px; top: 9px; }
+
+/* Large version for headers */
+.olympic-rings-lg {
+    width: 150px;
+    height: 72px;
+}
+
+.olympic-rings-lg .ring {
+    width: 42px;
+    height: 42px;
+    border-width: 4px;
+}
+
+.olympic-rings-lg .ring-blue { left: 0; top: 0; }
+.olympic-rings-lg .ring-black { left: 36px; top: 0; }
+.olympic-rings-lg .ring-red { left: 72px; top: 0; }
+.olympic-rings-lg .ring-yellow { left: 18px; top: 21px; }
+.olympic-rings-lg .ring-green { left: 54px; top: 21px; }
+
+/* =============================================================================
+   FLAG EMOJI STYLING
+   ============================================================================= */
+.flag-emoji {
+    font-size: 1.25em;
+    line-height: 1;
+    vertical-align: middle;
+}
+
+.flag-emoji-lg {
+    font-size: 2em;
+}
+
+.flag-emoji-sm {
+    font-size: 1em;
+}
+
+/* Country name with flag - common pattern */
+.country-with-flag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.country-with-flag .flag-emoji {
+    flex-shrink: 0;
+}
+
+/* =============================================================================
+   NAVBAR CUSTOMIZATION
+   ============================================================================= */
 .navbar {
-    background: linear-gradient(135deg, var(--olympics-blue), #0066a4) !important;
+    background: linear-gradient(135deg, var(--ring-blue), var(--alpine-blue)) !important;
 }
 
 .navbar-brand {
     font-weight: bold;
     font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
 }
 
-/* Card hover effects */
+.navbar-brand .olympic-rings-sm {
+    margin-right: 0.25rem;
+}
+
+/* =============================================================================
+   CARD & TABLE STYLING
+   ============================================================================= */
 .card {
     transition: box-shadow 0.2s ease-in-out;
 }
@@ -30,12 +175,6 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* Medal badges */
-.badge {
-    font-weight: 500;
-}
-
-/* Table improvements */
 .table-responsive {
     overflow-x: auto;
 }
@@ -44,27 +183,105 @@
     white-space: nowrap;
 }
 
-/* Footer styling */
-footer {
-    background-color: var(--snow-white);
+/* Country row in tables - flag alignment */
+.table td .country-with-flag {
+    white-space: nowrap;
 }
 
-/* Leaderboard rank styling */
-.fs-5.fw-bold {
-    min-width: 30px;
+/* =============================================================================
+   MEDAL STYLING
+   ============================================================================= */
+.medal-gold {
+    color: var(--gold);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.medal-silver {
+    color: var(--silver);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.medal-bronze {
+    color: var(--bronze);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+/* Medal count badges */
+.badge-gold {
+    background-color: var(--gold) !important;
+    color: #000;
+}
+
+.badge-silver {
+    background-color: var(--silver) !important;
+    color: #000;
+}
+
+.badge-bronze {
+    background-color: var(--bronze) !important;
+    color: #fff;
+}
+
+/* =============================================================================
+   TIER SECTION STYLING
+   ============================================================================= */
+.tier-section {
+    border-left-width: 5px !important;
+}
+
+.tier-1 { border-color: var(--gold) !important; }
+.tier-2 { border-color: var(--silver) !important; }
+.tier-3 { border-color: var(--bronze) !important; }
+.tier-4 { border-color: var(--ring-blue) !important; }
+.tier-5 { border-color: #7b68ee !important; }
+.tier-6 { border-color: #20c997 !important; }
+
+/* Tier header badges */
+.tier-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.tier-badge-1 { background: linear-gradient(135deg, var(--gold), #daa520); color: #000; }
+.tier-badge-2 { background: linear-gradient(135deg, var(--silver), #a0a0a0); color: #000; }
+.tier-badge-3 { background: linear-gradient(135deg, var(--bronze), #8b4513); color: #fff; }
+.tier-badge-4 { background: linear-gradient(135deg, var(--ring-blue), #0055a4); color: #fff; }
+.tier-badge-5 { background: linear-gradient(135deg, #7b68ee, #6a5acd); color: #fff; }
+.tier-badge-6 { background: linear-gradient(135deg, #20c997, #17a085); color: #fff; }
+
+/* =============================================================================
+   LEADERBOARD STYLING
+   ============================================================================= */
+.leaderboard-rank {
+    font-size: 1.5rem;
+    font-weight: bold;
+    min-width: 45px;
     display: inline-block;
 }
 
-/* Pick selection styling */
+.leaderboard-rank-1 { color: var(--gold); }
+.leaderboard-rank-2 { color: var(--silver); }
+.leaderboard-rank-3 { color: var(--bronze); }
+
+/* =============================================================================
+   COUNTRY CHECKBOX (Pick Selection)
+   ============================================================================= */
 .country-checkbox {
     cursor: pointer;
-    border: 1px solid transparent;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    margin-bottom: 0.25rem;
     transition: all 0.15s ease;
+    border: 1px solid transparent;
 }
 
 .country-checkbox:hover {
     background-color: var(--ice-blue);
-    border-color: var(--olympics-blue);
+    border-color: var(--ring-blue);
 }
 
 .country-checkbox.selected {
@@ -72,38 +289,95 @@ footer {
     border-color: #0f5132;
 }
 
-/* Tier section styling */
-.tier-section {
-    border-left-width: 5px !important;
+.country-checkbox input:checked + label {
+    font-weight: bold;
 }
 
-/* Sticky sidebar */
-.sticky-top {
-    z-index: 1000;
+.never-medaled {
+    opacity: 0.85;
+    border-style: dashed !important;
 }
 
-/* Alert customization */
-.alert-info {
-    background-color: var(--ice-blue);
-    border-color: var(--olympics-blue);
+/* =============================================================================
+   FOOTER
+   ============================================================================= */
+footer {
+    background-color: var(--snow-white);
 }
 
-/* Button improvements */
-.btn-primary {
-    background-color: var(--olympics-blue);
-    border-color: var(--olympics-blue);
+.footer-rings {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
 }
 
-.btn-primary:hover {
-    background-color: #0066a4;
-    border-color: #0066a4;
+/* =============================================================================
+   HERO / WELCOME SECTION
+   ============================================================================= */
+.hero-olympics {
+    background: linear-gradient(135deg, var(--ice-blue) 0%, #ffffff 100%);
+    border-left: 5px solid var(--ring-blue);
+    position: relative;
+    overflow: hidden;
 }
 
-/* Mobile improvements */
+.hero-olympics::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(0,133,199,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+/* =============================================================================
+   ANIMATIONS
+   ============================================================================= */
+.navbar-brand .olympic-rings-sm {
+    animation: gentle-pulse 4s ease-in-out infinite;
+}
+
+@keyframes gentle-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.85; }
+}
+
+/* Podium animation for winners */
+.winner-animation {
+    animation: winner-glow 2s ease-in-out infinite;
+}
+
+@keyframes winner-glow {
+    0%, 100% { box-shadow: 0 0 5px rgba(255, 215, 0, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.8); }
+}
+
+/* =============================================================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================================================= */
 @media (max-width: 768px) {
     .navbar-brand span:first-child {
         font-size: 1.5rem;
     }
+    
+    .olympic-rings-sm {
+        width: 45px;
+        height: 23px;
+    }
+    
+    .olympic-rings-sm .ring {
+        width: 13px;
+        height: 13px;
+        border-width: 2px;
+    }
+    
+    .olympic-rings-sm .ring-blue { left: 0; top: 0; }
+    .olympic-rings-sm .ring-black { left: 11px; top: 0; }
+    .olympic-rings-sm .ring-red { left: 22px; top: 0; }
+    .olympic-rings-sm .ring-yellow { left: 5px; top: 7px; }
+    .olympic-rings-sm .ring-green { left: 16px; top: 7px; }
     
     .display-4 {
         font-size: 2.5rem;
@@ -116,60 +390,17 @@ footer {
     .card-body {
         padding: 1rem;
     }
+    
+    .flag-emoji {
+        font-size: 1em;
+    }
 }
 
-/* Olympics rings animation (subtle) */
-.navbar-brand span:first-child {
-    animation: gentle-bounce 3s ease-in-out infinite;
-}
-
-@keyframes gentle-bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-2px); }
-}
-
-/* Medal emoji sizing */
-.fs-1 {
-    font-size: 2.5rem !important;
-}
-
-.fs-2 {
-    font-size: 2rem !important;
-}
-
-/* Progress and status badges */
-.badge.bg-success {
-    background-color: var(--olympics-green) !important;
-}
-
-.badge.bg-warning {
-    background-color: var(--olympics-yellow) !important;
-}
-
-.badge.bg-danger {
-    background-color: var(--olympics-red) !important;
-}
-
-/* Accordion improvements for admin */
-.accordion-button:not(.collapsed) {
-    background-color: var(--ice-blue);
-    color: var(--olympics-blue);
-}
-
-/* Never medaled indicator */
-.never-medaled {
-    opacity: 0.85;
-    border-style: dashed !important;
-}
-
-/* Countdown/deadline banner */
-.bg-warning {
-    background-color: var(--olympics-yellow) !important;
-}
-
-/* Print styles */
+/* =============================================================================
+   PRINT STYLES
+   ============================================================================= */
 @media print {
-    .navbar, footer, .btn {
+    .navbar, footer, .btn, .olympic-rings {
         display: none !important;
     }
     
@@ -177,4 +408,32 @@ footer {
         border: 1px solid #ccc !important;
         box-shadow: none !important;
     }
+    
+    .flag-emoji {
+        font-size: 1rem;
+    }
+}
+
+/* =============================================================================
+   UTILITY CLASSES
+   ============================================================================= */
+.bg-ice {
+    background-color: var(--ice-blue);
+}
+
+.bg-snow {
+    background-color: var(--snow-white);
+}
+
+.text-olympic-blue {
+    color: var(--ring-blue);
+}
+
+.border-olympic-blue {
+    border-color: var(--ring-blue) !important;
+}
+
+/* Sticky positioning for sidebar */
+.sticky-top {
+    z-index: 1000;
 }
