@@ -4,22 +4,34 @@
 Utility functions for flags and display formatting.
 """
 
-from data.countries import COUNTRIES_BY_TIER, IOC_TO_ISO_OVERRIDES
+from data.countries import COUNTRIES_BY_TIER, IOC_TO_ISO
 
 
-def _build_ioc_to_iso_map():
-    """Build IOC→ISO map from canonical country data with optional overrides."""
-    mapping = {}
-    for tier_countries in COUNTRIES_BY_TIER.values():
-        for code in tier_countries.keys():
-            mapping[code] = code[:2].upper()
+def get_iso_code(ioc_code: str) -> str:
+    """
+    Get ISO 3166-1 alpha-2 code from IOC code.
+    
+    Uses the complete IOC_TO_ISO mapping from data/countries.py.
+    Returns lowercase ISO code for use with flag services.
 
-    mapping.update(IOC_TO_ISO_OVERRIDES)
-    return mapping
+    Args:
+        ioc_code: Three-letter IOC country code (e.g., 'USA', 'GER', 'SUI')
 
-
-# IOC Code to ISO 3166-1 alpha-2 mapping
-IOC_TO_ISO = _build_ioc_to_iso_map()
+    Returns:
+        Two-letter ISO code (lowercase) for flag services
+    """
+    if not ioc_code:
+        return ''
+    
+    ioc_upper = ioc_code.upper()
+    
+    # Look up in the complete mapping
+    if ioc_upper in IOC_TO_ISO:
+        return IOC_TO_ISO[ioc_upper]
+    
+    # Fallback: log warning and return empty (better than wrong flag)
+    print(f"WARNING: Unknown IOC code '{ioc_code}' - no ISO mapping found")
+    return ''
 
 
 def ioc_to_flag_emoji(ioc_code: str) -> str:
@@ -38,10 +50,11 @@ def ioc_to_flag_emoji(ioc_code: str) -> str:
     if not ioc_code:
         return ''
 
-    iso_code = IOC_TO_ISO.get(ioc_code.upper())
-
+    # Get the correct ISO code first
+    iso_code = get_iso_code(ioc_code)
+    
     if not iso_code:
-        iso_code = ioc_code[:2].upper()
+        return ''
 
     try:
         flag = ''
@@ -51,21 +64,6 @@ def ioc_to_flag_emoji(ioc_code: str) -> str:
         return flag
     except (ValueError, TypeError):
         return ''
-
-
-def get_iso_code(ioc_code: str) -> str:
-    """
-    Get ISO code from IOC code.
-
-    Args:
-        ioc_code: Three-letter IOC country code
-
-    Returns:
-        Two-letter ISO code (lowercase)
-    """
-    if not ioc_code:
-        return ''
-    return IOC_TO_ISO.get(ioc_code.upper(), ioc_code[:2]).lower()
 
 
 def get_flag_class(ioc_code: str) -> str:
@@ -79,14 +77,26 @@ def get_flag_class(ioc_code: str) -> str:
         CSS class string for flag-icons (e.g., 'fi fi-us')
     """
     iso_code = get_iso_code(ioc_code)
+    if not iso_code:
+        return ''
     return f'fi fi-{iso_code}'
 
 
-# Pre-generate flag lookup for all countries
-FLAG_EMOJI_LOOKUP = {
-    code: ioc_to_flag_emoji(code)
-    for code in IOC_TO_ISO.keys()
-}
+def get_flag_url(ioc_code: str, width: int = 80) -> str:
+    """
+    Get the flagcdn.com URL for a country flag.
+    
+    Args:
+        ioc_code: Three-letter IOC country code
+        width: Image width in pixels (default 80)
+    
+    Returns:
+        URL to flag image, or empty string if mapping not found
+    """
+    iso_code = get_iso_code(ioc_code)
+    if not iso_code:
+        return ''
+    return f'https://flagcdn.com/w{width}/{iso_code}.png'
 
 
 def register_template_helpers(app):
@@ -107,6 +117,33 @@ def register_template_helpers(app):
         """Jinja2 filter to get flag-icons CSS class."""
         return get_flag_class(ioc_code)
 
+    @app.template_filter('iso')
+    def iso_code_filter(ioc_code):
+        """
+        Convert IOC code to ISO 3166-1 alpha-2 code for flag assets.
+        Usage: {{ 'GER'|iso }} -> 'de'
+        """
+        return get_iso_code(ioc_code)
+
+    @app.template_filter('flag_img')
+    def flag_img_filter(ioc_code, height='1.5rem'):
+        """
+        Jinja2 filter to generate a complete flag <img> tag.
+        Usage: {{ 'USA'|flag_img }} or {{ 'USA'|flag_img('2rem') }}
+        
+        Returns an img tag with the country flag, or empty string if not found.
+        """
+        iso_code = get_iso_code(ioc_code)
+        if not iso_code:
+            return ''
+        
+        url = f'https://flagcdn.com/w80/{iso_code}.png'
+        return Markup(
+            f'<img src="{url}" alt="{ioc_code}" '
+            f'style="height: {height}; width: auto; border-radius: 2px; '
+            f'box-shadow: 0 1px 3px rgba(0,0,0,0.2); vertical-align: middle;">'
+        )
+
     @app.template_filter('medal_count')
     def medal_count_filter(country):
         """
@@ -119,11 +156,6 @@ def register_template_helpers(app):
         return Markup(
             f"🥇 {country.gold_count} | 🥈 {country.silver_count} | 🥉 {country.bronze_count}"
         )
-
-    @app.template_filter('iso')
-    def iso_code_filter(ioc_code):
-        """Convert IOC code to ISO 3166-1 alpha-2 code for flag assets."""
-        return get_iso_code(ioc_code)
 
     @app.template_global()
     def medal_points(country):
