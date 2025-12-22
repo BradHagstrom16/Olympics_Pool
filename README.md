@@ -286,10 +286,6 @@ medal_audit    # Audit log of all medal changes
 - [ ] **Mobile App**: Native iOS/Android applications
 - [ ] **Social Features**: Comments, trash talk, and player interactions
 
-## 🐛 Known Issues
-
-See [`REVIEW.md`](REVIEW.md) for detailed code review findings and improvement opportunities.
-
 ## 📜 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -317,5 +313,6 @@ Contributions, issues, and feature requests are welcome! Feel free to check the 
 **Made with ❤️ for Winter Olympics fans**
 
 🏔️ ⛷️ 🏒 ⛸️ 🏂
+
 
 </div>
